@@ -9,382 +9,399 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.min.js"></script>
   <style>
-    /* ---------- Light page background + darker cards for contrast ---------- */
-    :root {
-      --bg:#d2d2d2;        /* page */
-      --card:#1f242b;      /* dark grey (not black) */
-      --border:#3a414b;    /* card border */
-      --fg:#f7f9fc;        /* main text inside cards */
-      --muted:#cfd6df;     /* labels inside cards */
-      --accent:#0d6efd;    /* brand */
-      --thead:#eef2f7;     /* table thead text */
-      --thead-bg:rgba(255,255,255,0.06);
+    /* ---------- Page shells ---------- */
+    :root{
+      --page-top:#d2d2d2;   /* banner/top strip */
+      --page-bottom:#606060;/* rest of page */
+      --card:#222831;       /* dark grey card */
+      --border:#3a414b;
+      --fg:#f7f9fc;         /* bright text inside cards */
+      --fg-strong:#ffffff;  /* headings/KPIs */
+      --fg-muted:#d7dee7;   /* labels inside cards */
+      --accent:#0d6efd;
+      --thead:#f4f7fb;
+      --thead-bg:rgba(255,255,255,.08);
     }
 
-    body{ background:var(--bg); color:#111; }
+    html,body{ height:100%; }
+    body{ margin:0; background:var(--page-bottom); color:#111; }
 
+    .top-shell{ background:var(--page-top); }
+    .content-shell{ background:var(--page-bottom); }
+
+    /* Banner */
+    .banner-wrap{ background:var(--page-top); border-bottom:1px solid #c6c6c6; }
+    .banner-logo{ max-height:88px; }
+    @media (min-width:576px){ .banner-logo{ max-height:120px; } }
+    @media (min-width:992px){ .banner-logo{ max-height:288px; } } /* ~4× desktop */
+
+    /* Page header (sits in top-shell, on light bg) */
+    .page-header{ color:#111; }
+    .page-header .muted{ color:#555e69; }
+
+    /* Cards */
     .card{
       background:var(--card);
       border:1px solid var(--border);
       border-radius:16px;
-      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      box-shadow:0 6px 18px rgba(0,0,0,.12);
+      color:var(--fg);
     }
-
-    /* Page header on light bg */
-    .page-header{ color:#111; }
-    .page-header .muted{ color:#545c66; }
-
-    /* Readability inside dark cards */
-    .card h1,.card h2,.card h3,.card h4,.card h5,.card h6{ color:#ffffff; }
-    .card .form-label,.card .nav-link,.card .table th{ color:#e8edf4; }
-    .muted{ color:var(--muted); }
+    .card h1,.card h2,.card h3,.card h4,.card h5,.card h6{ color:var(--fg-strong); }
+    .card .form-label{ color:var(--fg-muted); }
+    .card .small, .card small{ color:var(--fg); }        /* ensure Account/Network/Balance visible */
+    .muted{ color:var(--fg-muted); }
 
     a{ color:#0b73e0; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
     .btn{ border-radius:12px; }
     .divider{ height:1px; background:var(--border); margin:1rem 0; }
 
-    /* Inputs/buttons readable on dark cards */
-    .form-control, .form-select{
+    /* Inputs */
+    .form-control,.form-select{
       background:#0f141a;
       border:1px solid var(--border);
       color:var(--fg);
     }
     .form-control::placeholder{ color:#b8c1cc; }
 
-    /* Tabs sit on light page */
+    /* Tabs (on top-shell/page-bottom boundary) */
     .nav-tabs{ border-bottom:0; overflow-x:auto; white-space:nowrap; }
-    .nav-tabs .nav-link{ border:0; color:#5b6675; }
+    .nav-tabs .nav-link{ border:0; color:#1c222b; }
     .nav-tabs .nav-link.active{ color:#111; background:transparent; border-bottom:2px solid var(--accent); }
 
-    /* Tables: higher contrast */
+    /* Tables: strong contrast */
     .table{ color:var(--fg); }
     .table thead th{
       color:var(--thead);
       background:var(--thead-bg);
       border-bottom-color:var(--border);
     }
-    .table td, .table th{ border-color:var(--border); }
+    .table td,.table th{
+      border-color:var(--border);
+      color:var(--fg);               /* force readable cell values */
+    }
     .table-responsive{ -webkit-overflow-scrolling:touch; }
+
+    /* Labels/checkbox */
+    .form-check-label{ color:var(--fg); } /* “Use tokens (with bonus) …” */
 
     /* Layout grid */
     .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
     @media (max-width: 992px){ .grid-2{ grid-template-columns:1fr; } }
 
-    /* Banner */
-    .banner-wrap{ background:#e9e9e9; border-bottom:1px solid #c6c6c6; }
-    .banner-logo{ max-height:88px; }              /* mobile default */
-    @media (min-width:576px){ .banner-logo{ max-height:120px; } }  /* tablets */
-    @media (min-width:992px){ .banner-logo{ max-height:288px; } }  /* 4× desktop */
+    /* KPIs */
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; color:var(--fg-strong); }
+    .card .h5,.card .h6{ color:var(--fg-strong); }
 
-    /* Mobile polish: bigger tap targets */
+    /* Mobile polish */
     @media (max-width:576px){
       .card .btn{ width:100%; }
       .form-text{ font-size:.8rem; }
     }
-
-    /* Ensure KPIs are bright */
-    .card .h5, .card .h6, .card .mono{ color:var(--fg); }
   </style>
 </head>
 <body>
 
-<!-- Banner -->
-<div class="banner-wrap text-center py-3">
-  <picture>
-    <source srcset="assets/megaengage-banner.webp" type="image/webp">
-    <img src="assets/megaengage-banner.webp"
-         onerror="this.onerror=null;this.src='assets/megaengage-banner.png';"
-         alt="MegaEngage" class="img-fluid banner-logo">
-  </picture>
+<!-- ===== Top area (light) ===== -->
+<div class="top-shell">
+  <div class="banner-wrap text-center py-3">
+    <picture>
+      <source srcset="assets/megaengage-banner.webp" type="image/webp">
+      <img src="assets/megaengage-banner.webp"
+           onerror="this.onerror=null;this.src='assets/megaengage-banner.png';"
+           alt="MegaEngage" class="img-fluid banner-logo">
+    </picture>
+  </div>
+  <div class="container py-3">
+    <header class="page-header">
+      <h1 class="h3 mb-1">MegaEngage</h1>
+      <div class="muted">Testnet dApp (engagement) + MEGA airdrop calculator + tweet badge</div>
+    </header>
+  </div>
 </div>
 
-<div class="container py-4">
-  <header class="mb-4 page-header">
-    <h1 class="h3 mb-1">MegaEngage</h1>
-    <div class="muted">Testnet dApp (engagement) + MEGA airdrop calculator + tweet badge</div>
-  </header>
+<!-- ===== Main content (dark) ===== -->
+<div class="content-shell">
+  <div class="container pt-3">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-engage" data-bs-toggle="tab" data-bs-target="#pane-engage" type="button" role="tab">Engage dApp</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-calc" data-bs-toggle="tab" data-bs-target="#pane-calc" type="button" role="tab">Airdrop Calculator</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-tweet" data-bs-toggle="tab" data-bs-target="#pane-tweet" type="button" role="tab">Tweet Badge</button>
+      </li>
+    </ul>
 
-  <!-- Tabs -->
-  <ul class="nav nav-tabs mb-3" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="tab-engage" data-bs-toggle="tab" data-bs-target="#pane-engage" type="button" role="tab">Engage dApp</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="tab-calc" data-bs-toggle="tab" data-bs-target="#pane-calc" type="button" role="tab">Airdrop Calculator</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="tab-tweet" data-bs-toggle="tab" data-bs-target="#pane-tweet" type="button" role="tab">Tweet Badge</button>
-    </li>
-  </ul>
+    <div id="alerts"></div>
 
-  <div id="alerts"></div>
-
-  <div class="tab-content">
-    <!-- ===================== ENGAGE ===================== -->
-    <div class="tab-pane fade show active" id="pane-engage" role="tabpanel" aria-labelledby="tab-engage">
-      <div class="row g-3">
-        <!-- Wallet / Network -->
-        <div class="col-12 col-lg-6">
-          <div class="card p-3">
-            <h2 class="h5 mb-3">1) Connect & Add MegaETH Testnet</h2>
-            <p class="muted mb-2">Chain ID <code>6342</code> · RPC <code>https://carrot.megaeth.com/rpc</code> · Explorer <code>megaexplorer.xyz</code></p>
-            <div class="d-flex gap-2 flex-wrap">
-              <button id="btnConnect" class="btn btn-primary">Connect Wallet</button>
-              <button id="btnAddNet" class="btn btn-outline-light">Add Network</button>
-              <button id="btnSwitch" class="btn btn-outline-light">Switch to MegaETH</button>
-            </div>
-            <div class="mt-3 small">
-              <div>Account: <span id="account" class="muted">—</span></div>
-              <div>Network: <span id="network" class="muted">—</span></div>
-              <div>Balance: <span id="balance" class="muted">—</span></div>
-            </div>
-            <div class="divider"></div>
-            <p class="muted mb-1">Get test ETH (faucet):</p>
-            <ul class="mb-0">
-              <li><a href="https://testnet.megaeth.com/" target="_blank" rel="noreferrer">Official testnet portal</a></li>
-              <li><a href="https://docs.megaeth.com/faucet" target="_blank" rel="noreferrer">Docs: Faucet</a></li>
-            </ul>
-          </div>
-        </div>
-        <!-- Test transaction -->
-        <div class="col-12 col-lg-6">
-          <div class="card p-3">
-            <h2 class="h5 mb-3">2) Fire a Test Transaction</h2>
-            <p class="muted">Sends a tiny self-transfer on MegaETH Testnet (needs faucet ETH).</p>
-            <div class="row g-2">
-              <div class="col-6">
-                <label class="form-label">Amount (ETH)</label>
-                <input id="txAmount" class="form-control" value="0.00001"/>
-              </div>
-              <div class="col-6">
-                <label class="form-label">Max Fee (gwei)</label>
-                <input id="maxFee" class="form-control" value="0.1"/>
-              </div>
-            </div>
-            <button id="btnSendTx" class="btn btn-success mt-2">Send Test Tx</button>
-            <div class="mt-3 small" id="txStatus" style="min-height:1.5rem;"></div>
-          </div>
-        </div>
-        <!-- Contract interaction -->
-        <div class="col-12">
-          <div class="card p-3">
-            <h2 class="h5 mb-3">3) Interact with your Counter Contract</h2>
-            <p class="muted">Deploy once in Remix (see <strong>MegaCounter.sol</strong> below), paste the address, then read/increment.</p>
-            <div class="row g-2 align-items-end">
-              <div class="col-md-6">
-                <label class="form-label">Counter Contract Address</label>
-                <input id="ctrAddr" class="form-control" placeholder="0x..."/>
-              </div>
-              <div class="col-md-6">
-                <button id="btnLoadCtr" class="btn btn-outline-light">Load Contract</button>
-              </div>
-            </div>
-            <div class="d-flex gap-2 mt-3 flex-wrap">
-              <button id="btnRead" class="btn btn-secondary">Read count()</button>
-              <input id="msg" class="form-control" placeholder="message for increment()" style="max-width:280px;">
-              <button id="btnInc" class="btn btn-warning">increment(message)</button>
-            </div>
-            <div class="mt-3 small" id="ctrStatus" style="min-height:1.5rem;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===================== CALCULATOR ===================== -->
-    <div class="tab-pane fade" id="pane-calc" role="tabpanel" aria-labelledby="tab-calc">
-      <!-- Inputs -->
-      <div class="card p-3 mb-3">
-        <h2 class="h5 mb-3">MEGA Airdrop / Allocation Calculator</h2>
+    <div class="tab-content">
+      <!-- ============ ENGAGE ============ -->
+      <div class="tab-pane fade show active" id="pane-engage" role="tabpanel" aria-labelledby="tab-engage">
         <div class="row g-3">
-          <div class="col-md-3">
-            <label class="form-label">Bid amount (USDT)</label>
-            <input id="bid" type="number" class="form-control" value="2700" min="0" step="1">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Clearing price P ($/MEGA)</label>
-            <input id="price" type="number" class="form-control" value="0.0999" min="0.000001" step="0.0001">
-            <div class="form-text muted">Auction price; cap = 0.0999</div>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Lock discount (%)</label>
-            <div class="input-group">
-              <input id="discount" type="number" class="form-control" value="10" min="0" max="50" step="1">
-              <button id="toggleLock" class="btn btn-outline-light">Toggle lock</button>
+          <div class="col-12 col-lg-6">
+            <div class="card p-3">
+              <h2 class="h5 mb-3">1) Connect & Add MegaETH Testnet</h2>
+              <p class="muted mb-2">Chain ID <code>6342</code> · RPC <code>https://carrot.megaeth.com/rpc</code> · Explorer <code>megaexplorer.xyz</code></p>
+              <div class="d-flex gap-2 flex-wrap">
+                <button id="btnConnect" class="btn btn-primary">Connect Wallet</button>
+                <button id="btnAddNet" class="btn btn-outline-light">Add Network</button>
+                <button id="btnSwitch" class="btn btn-outline-light">Switch to MegaETH</button>
+              </div>
+              <div class="mt-3 small">
+                <div>Account: <span id="account" class="mono">—</span></div>
+                <div>Network: <span id="network" class="mono">—</span></div>
+                <div>Balance: <span id="balance" class="mono">—</span></div>
+              </div>
+              <div class="divider"></div>
+              <p class="muted mb-1">Get test ETH (faucet):</p>
+              <ul class="mb-0">
+                <li><a href="https://testnet.megaeth.com/" target="_blank" rel="noreferrer">Official testnet portal</a></li>
+                <li><a href="https://docs.megaeth.com/faucet" target="_blank" rel="noreferrer">Docs: Faucet</a></li>
+              </ul>
             </div>
-            <div class="form-text muted">10% if 1-year lock</div>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Bonus tokens (%)</label>
-            <input id="bonus" type="number" class="form-control" value="0" min="0" max="100" step="1">
-            <div class="form-text muted">Leaderboard bonus at TGE</div>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Total supply (MEGA)</label>
-            <input id="supply" type="number" class="form-control" value="10000000000" step="1000000">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">TGE FDV (preset)</label>
-            <select id="fdvPreset" class="form-select">
-              <option value="1000000000">$1.0B</option>
-              <option value="1500000000">$1.5B</option>
-              <option value="2000000000" selected>$2.0B</option>
-              <option value="3000000000">$3.0B</option>
-              <option value="5000000000">$5.0B</option>
-              <option value="custom">Custom below…</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">TGE FDV (custom, $)</label>
-            <input id="fdvCustom" type="number" class="form-control" value="2000000000" step="50000000">
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label">Holding APY (%)</label>
-            <input id="apy" type="number" class="form-control" value="20" min="0" max="100" step="0.1">
-            <div class="form-text muted">Compounded for 12m breakeven</div>
+          <div class="col-12 col-lg-6">
+            <div class="card p-3">
+              <h2 class="h5 mb-3">2) Fire a Test Transaction</h2>
+              <p class="muted">Sends a tiny self-transfer on MegaETH Testnet (needs faucet ETH).</p>
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label">Amount (ETH)</label>
+                  <input id="txAmount" class="form-control" value="0.00001"/>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Max Fee (gwei)</label>
+                  <input id="maxFee" class="form-control" value="0.1"/>
+                </div>
+              </div>
+              <button id="btnSendTx" class="btn btn-success mt-2">Send Test Tx</button>
+              <div class="mt-3 small mono" id="txStatus" style="min-height:1.5rem;"></div>
+            </div>
           </div>
 
-          <!-- Broken Coins dropdown -->
-          <div class="col-md-3">
-            <label class="form-label">Compare holding (“Broken Coins”)</label>
-            <select id="coinSelect" class="form-select">
-              <option value="ATOM" selected>ATOM</option>
-              <option value="XRP">XRP</option>
-              <option value="ADA">ADA</option>
-              <option value="DOT">DOT</option>
-            </select>
-            <div class="form-text muted">Prefills APY; you can still edit it.</div>
+          <div class="col-12">
+            <div class="card p-3">
+              <h2 class="h5 mb-3">3) Interact with your Counter Contract</h2>
+              <p class="muted">Deploy once in Remix (see <strong>MegaCounter.sol</strong> below), paste the address, then read/increment.</p>
+              <div class="row g-2 align-items-end">
+                <div class="col-md-6">
+                  <label class="form-label">Counter Contract Address</label>
+                  <input id="ctrAddr" class="form-control" placeholder="0x..."/>
+                </div>
+                <div class="col-md-6">
+                  <button id="btnLoadCtr" class="btn btn-outline-light">Load Contract</button>
+                </div>
+              </div>
+              <div class="d-flex gap-2 mt-3 flex-wrap">
+                <button id="btnRead" class="btn btn-secondary">Read count()</button>
+                <input id="msg" class="form-control" placeholder="message for increment()" style="max-width:280px;">
+                <button id="btnInc" class="btn btn-warning">increment(message)</button>
+              </div>
+              <div class="mt-3 small mono" id="ctrStatus" style="min-height:1.5rem;"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Results -->
-      <div class="grid-2 mb-3">
-        <div class="card p-3">
-          <h3 class="h6 mb-3">Allocation & ROI (at TGE)</h3>
-          <div class="row g-2">
-            <div class="col-6">
-              <div class="muted">Effective paid price</div>
-              <div class="h5 mono" id="effPrice">—</div>
+      <!-- ============ CALCULATOR ============ -->
+      <div class="tab-pane fade" id="pane-calc" role="tabpanel" aria-labelledby="tab-calc">
+        <div class="card p-3 mb-3">
+          <h2 class="h5 mb-3">MEGA Airdrop / Allocation Calculator</h2>
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Bid amount (USDT)</label>
+              <input id="bid" type="number" class="form-control" value="2700" min="0" step="1">
             </div>
-            <div class="col-6">
-              <div class="muted">TGE price (= FDV / supply)</div>
-              <div class="h5 mono" id="tgePrice">—</div>
+            <div class="col-md-3">
+              <label class="form-label">Clearing price P ($/MEGA)</label>
+              <input id="price" type="number" class="form-control" value="0.0999" min="0.000001" step="0.0001">
+              <div class="form-text muted">Auction price; cap = 0.0999</div>
             </div>
-            <div class="col-6">
-              <div class="muted">Tokens (no bonus)</div>
-              <div class="h5 mono" id="tokensBase">—</div>
+            <div class="col-md-3">
+              <label class="form-label">Lock discount (%)</label>
+              <div class="input-group">
+                <input id="discount" type="number" class="form-control" value="10" min="0" max="50" step="1">
+                <button id="toggleLock" class="btn btn-outline-light">Toggle lock</button>
+              </div>
+              <div class="form-text muted">10% if 1-year lock</div>
             </div>
-            <div class="col-6">
-              <div class="muted">Tokens (with bonus)</div>
-              <div class="h5 mono" id="tokensBonus">—</div>
+            <div class="col-md-3">
+              <label class="form-label">Bonus tokens (%)</label>
+              <input id="bonus" type="number" class="form-control" value="0" min="0" max="100" step="1">
+              <div class="form-text muted">Leaderboard bonus at TGE</div>
             </div>
-          </div>
-          <hr>
-          <div class="row g-2">
-            <div class="col-6">
-              <div class="muted">Value @ TGE (no bonus)</div>
-              <div class="h5 mono" id="valBase">—</div>
-              <div class="muted">ROI %</div>
-              <div class="h6 mono" id="roiBase">—</div>
-            </div>
-            <div class="col-6">
-              <div class="muted">Value @ TGE (with bonus)</div>
-              <div class="h5 mono" id="valBonus">—</div>
-              <div class="muted">ROI %</div>
-              <div class="h6 mono" id="roiBonus">—</div>
-            </div>
-          </div>
-          <div class="mt-3">
-            <button id="btnCSV" class="btn btn-outline-light btn-sm">Download CSV</button>
-          </div>
-        </div>
 
-        <div class="card p-3">
-          <h3 class="h6 mb-3">Breakeven vs Holding <span id="coinLabel">ATOM</span> (12 months)</h3>
-          <div class="row g-2">
-            <div class="col-md-4">
-              <div class="muted">Compounding</div>
-              <select id="compound" class="form-select">
-                <option value="12" selected>Monthly</option>
-                <option value="4">Quarterly</option>
-                <option value="1">Annual</option>
+            <div class="col-md-3">
+              <label class="form-label">Total supply (MEGA)</label>
+              <input id="supply" type="number" class="form-control" value="10000000000" step="1000000">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">TGE FDV (preset)</label>
+              <select id="fdvPreset" class="form-select">
+                <option value="1000000000">$1.0B</option>
+                <option value="1500000000">$1.5B</option>
+                <option value="2000000000" selected>$2.0B</option>
+                <option value="3000000000">$3.0B</option>
+                <option value="5000000000">$5.0B</option>
+                <option value="custom">Custom below…</option>
               </select>
             </div>
-            <div class="col-md-8">
-              <div class="muted"><span id="coinLabel2">ATOM</span> USD scenarios</div>
-              <div class="d-flex gap-2 flex-wrap">
-                <button class="btn btn-outline-light btn-sm" data-chg="-0.3">−30%</button>
-                <button class="btn btn-outline-light btn-sm" data-chg="0">0%</button>
-                <button class="btn btn-outline-light btn-sm" data-chg="0.5">+50%</button>
-              </div>
+            <div class="col-md-3">
+              <label class="form-label">TGE FDV (custom, $)</label>
+              <input id="fdvCustom" type="number" class="form-control" value="2000000000" step="50000000">
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Holding APY (%)</label>
+              <input id="apy" type="number" class="form-control" value="20" min="0" max="100" step="0.1">
+              <div class="form-text muted">Compounded for 12m breakeven</div>
+            </div>
+
+            <!-- Broken Coins -->
+            <div class="col-md-3">
+              <label class="form-label">Compare holding (“Broken Coins”)</label>
+              <select id="coinSelect" class="form-select">
+                <option value="ATOM" selected>ATOM</option>
+                <option value="XRP">XRP</option>
+                <option value="ADA">ADA</option>
+                <option value="DOT">DOT</option>
+              </select>
+              <div class="form-text muted">Prefills APY; you can still edit it.</div>
             </div>
           </div>
-          <div class="table-responsive mt-3">
-            <table class="table table-sm table-bordered align-middle text-nowrap">
-              <thead>
-                <tr>
-                  <th><span id="coinLabel3">ATOM</span> 12m change</th>
-                  <th>End value (holding)</th>
-                  <th>Breakeven TGE price</th>
-                  <th>Breakeven FDV</th>
-                </tr>
-              </thead>
-              <tbody id="breakevenRows"></tbody>
-            </table>
+        </div>
+
+        <div class="grid-2 mb-3">
+          <div class="card p-3">
+            <h3 class="h6 mb-3">Allocation & ROI (at TGE)</h3>
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="muted">Effective paid price</div>
+                <div class="h5 mono" id="effPrice">—</div>
+              </div>
+              <div class="col-6">
+                <div class="muted">TGE price (= FDV / supply)</div>
+                <div class="h5 mono" id="tgePrice">—</div>
+              </div>
+              <div class="col-6">
+                <div class="muted">Tokens (no bonus)</div>
+                <div class="h5 mono" id="tokensBase">—</div>
+              </div>
+              <div class="col-6">
+                <div class="muted">Tokens (with bonus)</div>
+                <div class="h5 mono" id="tokensBonus">—</div>
+              </div>
+            </div>
+            <hr>
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="muted">Value @ TGE (no bonus)</div>
+                <div class="h5 mono" id="valBase">—</div>
+                <div class="muted">ROI %</div>
+                <div class="h6 mono" id="roiBase">—</div>
+              </div>
+              <div class="col-6">
+                <div class="muted">Value @ TGE (with bonus)</div>
+                <div class="h5 mono" id="valBonus">—</div>
+                <div class="muted">ROI %</div>
+                <div class="h6 mono" id="roiBonus">—</div>
+              </div>
+            </div>
+            <div class="mt-3">
+              <button id="btnCSV" class="btn btn-outline-light btn-sm">Download CSV</button>
+            </div>
           </div>
-          <div class="form-check mt-2">
-            <input class="form-check-input" type="checkbox" id="useBonusForBreakeven">
-            <label class="form-check-label" for="useBonusForBreakeven">Use <span class="mono">tokens (with bonus)</span> for breakeven</label>
+
+          <div class="card p-3">
+            <h3 class="h6 mb-3">Breakeven vs Holding <span id="coinLabel">ATOM</span> (12 months)</h3>
+            <div class="row g-2">
+              <div class="col-md-4">
+                <div class="muted">Compounding</div>
+                <select id="compound" class="form-select">
+                  <option value="12" selected>Monthly</option>
+                  <option value="4">Quarterly</option>
+                  <option value="1">Annual</option>
+                </select>
+              </div>
+              <div class="col-md-8">
+                <div class="muted"><span id="coinLabel2">ATOM</span> USD scenarios</div>
+                <div class="d-flex gap-2 flex-wrap">
+                  <button class="btn btn-outline-light btn-sm" data-chg="-0.3">−30%</button>
+                  <button class="btn btn-outline-light btn-sm" data-chg="0">0%</button>
+                  <button class="btn btn-outline-light btn-sm" data-chg="0.5">+50%</button>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive mt-3">
+              <table class="table table-sm table-bordered align-middle text-nowrap">
+                <thead>
+                  <tr>
+                    <th><span id="coinLabel3">ATOM</span> 12m change</th>
+                    <th>End value (holding)</th>
+                    <th>Breakeven TGE price</th>
+                    <th>Breakeven FDV</th>
+                  </tr>
+                </thead>
+                <tbody id="breakevenRows"></tbody>
+              </table>
+            </div>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" id="useBonusForBreakeven">
+              <label class="form-check-label" for="useBonusForBreakeven">Use <span class="mono">tokens (with bonus)</span> for breakeven</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ TWEET ============ -->
+      <div class="tab-pane fade" id="pane-tweet" role="tabpanel" aria-labelledby="tab-tweet">
+        <div class="card p-3 mb-3">
+          <h2 class="h5 mb-2">Tweet Badge Generator</h2>
+          <p class="muted mb-3">Bundle your repo/demo and MegaETH testnet tx hashes into a clean tweet.</p>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Your repo URL (optional)</label>
+              <input id="repoUrl" class="form-control" placeholder="https://github.com/you/megaengage">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Live demo URL (optional)</label>
+              <input id="siteUrl" class="form-control" placeholder="https://mega.petranto.com/">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Your X handle (optional)</label>
+              <input id="xHandle" class="form-control" placeholder="@yourhandle">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Recent MegaETH tx hashes (newline-separated)</label>
+              <textarea id="txHashes" class="form-control mono" rows="4" placeholder="0xabc...\n0xdef..."></textarea>
+            </div>
+            <div class="col-12 d-flex gap-2 flex-wrap">
+              <button id="btnBuildTweet" class="btn btn-primary">Build tweet</button>
+              <button id="btnCopyTweet" class="btn btn-outline-light">Copy text</button>
+              <a id="tweetLink" class="btn btn-success" target="_blank" rel="noreferrer">Open tweet</a>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Tweet preview</label>
+              <textarea id="tweetOut" class="form-control mono" rows="7" readonly></textarea>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ===================== TWEET ===================== -->
-    <div class="tab-pane fade" id="pane-tweet" role="tabpanel" aria-labelledby="tab-tweet">
-      <div class="card p-3 mb-3">
-        <h2 class="h5 mb-2">Tweet Badge Generator</h2>
-        <p class="muted mb-3">Bundle your repo/demo and MegaETH testnet tx hashes into a clean tweet.</p>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label">Your repo URL (optional)</label>
-            <input id="repoUrl" class="form-control" placeholder="https://github.com/you/megaengage">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Live demo URL (optional)</label>
-            <input id="siteUrl" class="form-control" placeholder="https://mega.petranto.com/">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Your X handle (optional)</label>
-            <input id="xHandle" class="form-control" placeholder="@yourhandle">
-          </div>
-          <div class="col-12">
-            <label class="form-label">Recent MegaETH tx hashes (newline-separated)</label>
-            <textarea id="txHashes" class="form-control mono" rows="4" placeholder="0xabc...\n0xdef..."></textarea>
-          </div>
-          <div class="col-12 d-flex gap-2 flex-wrap">
-            <button id="btnBuildTweet" class="btn btn-primary">Build tweet</button>
-            <button id="btnCopyTweet" class="btn btn-outline-light">Copy text</button>
-            <a id="tweetLink" class="btn btn-success" target="_blank" rel="noreferrer">Open tweet</a>
-          </div>
-          <div class="col-12">
-            <label class="form-label">Tweet preview</label>
-            <textarea id="tweetOut" class="form-control mono" rows="7" readonly></textarea>
-          </div>
-        </div>
+    <footer class="pt-3 page-header">
+      <div class="muted small">
+        Tip: commit publicly and post your explorer links + repo demo on X for selection signals.
+        Explorer: <a href="https://megaexplorer.xyz" target="_blank" rel="noreferrer">megaexplorer.xyz</a> — Docs:
+        <a href="https://docs.megaeth.com" target="_blank" rel="noreferrer">docs.megaeth.com</a>
       </div>
-    </div>
+    </footer>
   </div>
-
-  <footer class="pt-3 page-header">
-    <div class="muted small">
-      Tip: commit publicly and post your explorer links + repo demo on X for selection signals.  
-      Explorer: <a href="https://megaexplorer.xyz" target="_blank" rel="noreferrer">megaexplorer.xyz</a> — Docs: <a href="https://docs.megaeth.com" target="_blank" rel="noreferrer">docs.megaeth.com</a>
-    </div>
-  </footer>
 </div>
 
 <script>
@@ -442,7 +459,7 @@
   $('btnAddNet').onclick = async () => {
     try {
       requireMM();
-      await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
+    await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
       alertBox('MegaETH Testnet added to MetaMask.', 'success');
       refreshBasics();
     } catch (e) { alertBox('Add network failed: ' + e.message, 'danger'); }
@@ -470,7 +487,7 @@
       if (!signer) throw new Error('Connect wallet first.');
       const amt = $('txAmount').value.trim();
       const maxFeeGwei = $('maxFee').value.trim();
-      const to = await signer.getAddress(); // self-transfer
+      const to = await signer.getAddress();
       $('txStatus').textContent = 'Sending…';
       const tx = await signer.sendTransaction({
         to,
@@ -527,10 +544,10 @@
 
   // ---------- “Broken Coins” presets ----------
   const COIN_PRESETS = {
-    ATOM: { apy: 0.20 },  // staking baseline
-    XRP:  { apy: 0.00 },  // no native staking
-    ADA:  { apy: 0.045 }, // delegated yield ballpark
-    DOT:  { apy: 0.12 }   // nomination yield ballpark
+    ATOM: { apy: 0.20 },
+    XRP:  { apy: 0.00 },
+    ADA:  { apy: 0.045 },
+    DOT:  { apy: 0.12 }
   };
   function setCoinUI(sym){
     ['coinLabel','coinLabel2','coinLabel3'].forEach(id=>{
@@ -538,37 +555,40 @@
       if(el) el.textContent = sym;
     });
     const preset = COIN_PRESETS[sym];
-    if (preset && $('apy')) $('apy').value = (preset.apy*100).toFixed(2);
+    if (preset && document.getElementById('apy')) {
+      document.getElementById('apy').value = (preset.apy*100).toFixed(2);
+    }
   }
-  if ($('coinSelect')) {
-    $('coinSelect').addEventListener('change', e => { setCoinUI(e.target.value); recalc(); });
-    setCoinUI($('coinSelect').value);
+  if (document.getElementById('coinSelect')) {
+    document.getElementById('coinSelect').addEventListener('change', e => { setCoinUI(e.target.value); recalc(); });
+    setCoinUI(document.getElementById('coinSelect').value);
   }
 
   // ---------- Calculator ----------
   const inputs = ['bid','price','discount','bonus','supply','fdvPreset','fdvCustom','apy','compound'];
-  inputs.forEach(id => $(id).addEventListener('input', recalc));
-  $('toggleLock').addEventListener('click', () => {
-    const d = parseFloat($('discount').value||0);
-    $('discount').value = (d>0?0:10).toString();
+  inputs.forEach(id => document.getElementById(id).addEventListener('input', recalc));
+  document.getElementById('toggleLock').addEventListener('click', () => {
+    const d = parseFloat(document.getElementById('discount').value||0);
+    document.getElementById('discount').value = (d>0?0:10).toString();
     recalc();
   });
-  $('fdvPreset').addEventListener('change', () => {
-    const v = $('fdvPreset').value;
-    if (v !== 'custom') $('fdvCustom').value = v;
+  document.getElementById('fdvPreset').addEventListener('change', () => {
+    const v = document.getElementById('fdvPreset').value;
+    if (v !== 'custom') document.getElementById('fdvCustom').value = v;
     recalc();
   });
   document.querySelectorAll('[data-chg]').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('[data-chg]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   }));
-  $('useBonusForBreakeven').addEventListener('change', recalc);
+  document.getElementById('useBonusForBreakeven').addEventListener('change', recalc);
 
   function vals(){
+    const $ = id => document.getElementById(id);
     const bid = +($('bid').value||0);
     const price = +($('price').value||0);
-    const discount = clamp(+($('discount').value||0), 0, 50) / 100;
-    const bonus = clamp(+($('bonus').value||0), 0, 100) / 100;
+    const discount = Math.min(Math.max(+($('discount').value||0),0),50)/100;
+    const bonus = Math.min(Math.max(+($('bonus').value||0),0),100)/100;
     const supply = +($('supply').value||0);
     const fdv = +($('fdvCustom').value||0);
     const apy = +($('apy').value||0)/100;
@@ -579,8 +599,8 @@
   function recalc(){
     const v = vals();
     if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) {
-      ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>$(id).textContent='—');
-      $('breakevenRows').innerHTML = '';
+      ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
+      document.getElementById('breakevenRows').innerHTML = '';
       buildTweetPreview(); return;
     }
     const effPrice = v.price * (1 - v.discount);
@@ -592,39 +612,39 @@
     const roiBase = (valBase - v.bid) / v.bid * 100;
     const roiBonus = (valBonus - v.bid) / v.bid * 100;
 
-    $('effPrice').textContent = '$' + fmtPrice(effPrice);
-    $('tokensBase').textContent = fmtNum(tokensBase);
-    $('tokensBonus').textContent = fmtNum(tokensBonus);
-    $('tgePrice').textContent = '$' + fmtPrice(tgePrice);
-    $('valBase').textContent = fmtUSD(valBase);
-    $('valBonus').textContent = fmtUSD(valBonus);
-    $('roiBase').textContent = (roiBase>=0?'+':'') + fmtNum(roiBase) + '%';
-    $('roiBonus').textContent = (roiBonus>=0?'+':'') + fmtNum(roiBonus) + '%';
+    document.getElementById('effPrice').textContent = '$' + effPrice.toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:6});
+    document.getElementById('tokensBase').textContent = tokensBase.toLocaleString(undefined,{maximumFractionDigits:2});
+    document.getElementById('tokensBonus').textContent = tokensBonus.toLocaleString(undefined,{maximumFractionDigits:2});
+    document.getElementById('tgePrice').textContent = '$' + tgePrice.toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:6});
+    document.getElementById('valBase').textContent = fmtUSD(valBase);
+    document.getElementById('valBonus').textContent = fmtUSD(valBonus);
+    document.getElementById('roiBase').textContent = (roiBase>=0?'+':'') + roiBase.toLocaleString(undefined,{maximumFractionDigits:2}) + '%';
+    document.getElementById('roiBonus').textContent = (roiBonus>=0?'+':'') + roiBonus.toLocaleString(undefined,{maximumFractionDigits:2}) + '%';
 
     // Breakeven table
     const compound = v.compound;
     const scenarios = [-0.30, 0, 0.50];
     const factor = Math.pow(1 + (v.apy/compound), compound);
-    const useBonus = $('useBonusForBreakeven').checked;
+    const useBonus = document.getElementById('useBonusForBreakeven').checked;
     const tokensForBreakeven = useBonus ? tokensBonus : tokensBase;
 
-    $('breakevenRows').innerHTML = scenarios.map(chg => {
+    document.getElementById('breakevenRows').innerHTML = scenarios.map(chg => {
       const endValue = v.bid * factor * (1 + chg);
       const neededPrice = tokensForBreakeven>0 ? endValue / tokensForBreakeven : NaN;
       const neededFDV = neededPrice * v.supply;
       return `<tr>
         <td>${(chg*100>0?'+':'')}${(chg*100).toFixed(0)}%</td>
         <td class="mono">${fmtUSD(endValue)}</td>
-        <td class="mono">$${fmtPrice(neededPrice)}</td>
-        <td class="mono">${neededFDV>0?('$'+neededFDV.toLocaleString()):'—'}</td>
+        <td class="mono">$${neededPrice.toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:6})}</td>
+        <td class="mono">$${neededFDV.toLocaleString()}</td>
       </tr>`;
     }).join('');
 
     buildTweetPreview();
   }
 
-  // ---------- CSV Export ----------
-  $('btnCSV').addEventListener('click', () => {
+  // CSV
+  document.getElementById('btnCSV').addEventListener('click', () => {
     const v = vals();
     if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) { alertBox('Fill bid, price, supply, FDV first.', 'warning'); return; }
     const effPrice = v.price*(1-v.discount);
@@ -633,9 +653,8 @@
     const tgePrice = v.fdv/v.supply;
     const valBase = tokensBase*tgePrice, valBonus = tokensBonus*tgePrice;
     const roiBase = (valBase-v.bid)/v.bid*100, roiBonus=(valBonus-v.bid)/v.bid*100;
-
     const factorMonthly = Math.pow(1+(v.apy/12),12);
-    const coinSym = ($('coinLabel')?.textContent || 'COIN');
+    const coinSym = (document.getElementById('coinLabel')?.textContent || 'COIN');
     const endFlat = v.bid * factorMonthly;
 
     const rows = [
@@ -663,12 +682,7 @@
     [-0.30,0,0.50].forEach(chg=>{
       const endValue = v.bid * Math.pow(1+(v.apy/12),12) * (1+chg);
       const priceReq = endValue / (v.bonus>0 ? tokensBonus : tokensBase);
-      rows.push([
-        (chg*100)+'%',
-        endValue,
-        priceReq,
-        priceReq*v.supply
-      ]);
+      rows.push([ (chg*100)+'%', endValue, priceReq, priceReq*v.supply ]);
     });
 
     const csv = rows.map(r => (r||[]).map(c => {
@@ -688,7 +702,7 @@
     URL.revokeObjectURL(url);
   });
 
-  // ---------- Tweet badge ----------
+  // Tweet badge
   function buildTweetPreview(){
     const v = vals();
     const effPrice = (v.price>0) ? v.price*(1-v.discount) : NaN;
@@ -696,10 +710,10 @@
     const tgePrice = (v.fdv>0 && v.supply>0) ? v.fdv/v.supply : 0;
     const roi = (tokens*tgePrice>0 && v.bid>0) ? ((tokens*tgePrice - v.bid)/v.bid*100) : 0;
 
-    const repo = $('repoUrl').value?.trim();
-    const site = $('siteUrl').value?.trim();
-    const handle = $('xHandle').value?.trim();
-    const txs = $('txHashes').value?.trim().split('\n').filter(Boolean) || [];
+    const repo = document.getElementById('repoUrl').value?.trim();
+    const site = document.getElementById('siteUrl').value?.trim();
+    const handle = document.getElementById('xHandle').value?.trim();
+    const txs = document.getElementById('txHashes').value?.trim().split('\n').filter(Boolean) || [];
     const txLine = txs.length ? `Tx: ${txs.slice(0,5).join(' ')}` : '';
 
     const lines = [
@@ -715,16 +729,16 @@
     ].filter(Boolean);
 
     const text = lines.join('\n');
-    $('tweetOut').value = text;
-    $('tweetLink').href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
+    document.getElementById('tweetOut').value = text;
+    document.getElementById('tweetLink').href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
   }
-  $('btnBuildTweet').addEventListener('click', buildTweetPreview);
-  $('btnCopyTweet').addEventListener('click', async ()=>{
-    try { await navigator.clipboard.writeText($('tweetOut').value); alertBox('Tweet copied to clipboard!', 'success'); }
+  document.getElementById('btnBuildTweet').addEventListener('click', buildTweetPreview);
+  document.getElementById('btnCopyTweet').addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText(document.getElementById('tweetOut').value); alertBox('Tweet copied to clipboard!', 'success'); }
     catch(e){ alertBox('Copy failed: ' + e.message, 'danger'); }
   });
 
-  // ---------- React to account/network changes ----------
+  // React to account/network changes
   if (window.ethereum) {
     window.ethereum.on('accountsChanged', () => location.reload());
     window.ethereum.on('chainChanged', () => location.reload());
