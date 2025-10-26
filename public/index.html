@@ -84,6 +84,42 @@
     /* Utility */
     .stack > .card + .card{margin-top:1rem;} /* vertical stacking spacing */
   </style>
+  /* ===== Readability fix for tables on dark cards ===== */
+.table{
+  /* force Bootstrap table colors on dark background */
+  --bs-table-color: #f7f9fc;
+  --bs-table-bg: transparent;
+  --bs-table-border-color: #3a414b;
+  --bs-table-striped-bg: rgba(255,255,255,.06);
+  --bs-table-striped-color: #f7f9fc;
+  --bs-table-hover-bg: rgba(255,255,255,.10);
+  --bs-table-hover-color: #f7f9fc;
+  color: var(--bs-table-color) !important;
+  background-color: var(--bs-table-bg) !important;
+}
+
+.table thead th{
+  color:#ffffff !important;
+  background: rgba(255,255,255,.12) !important;
+  border-bottom-color:#3a414b !important;
+  font-weight:600;
+}
+
+.table tbody td,
+.table tbody th,
+.table tbody tr{
+  color:#f7f9fc !important;   /* bright text */
+  opacity:1 !important;       /* kill any muted opacity */
+  background: transparent !important;
+  border-color:#3a414b !important;
+}
+
+/* make sure the scroll container itself doesn't gray things out */
+.table-responsive{
+  -webkit-overflow-scrolling: touch;
+  background: transparent !important;
+}
+
 </head>
 <body>
 
