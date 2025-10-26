@@ -15,9 +15,9 @@
   <style>
     /* ---------- Theme ---------- */
     :root{
-      --page-top:#d2d2d2;     /* banner section */
+      --page-top:#d2d2d2;     /* banner section (very light) */
       --page-bottom:#606060;  /* main background under tabs */
-      --card:#222831;         /* dark grey card (not black) */
+      --card:#222831;         /* dark grey card */
       --border:#3a414b;
       --fg:#f7f9fc;           /* main text inside cards */
       --fg-strong:#ffffff;    /* headings/KPIs */
@@ -34,9 +34,9 @@
     .banner-wrap{background:var(--page-top);border-bottom:1px solid #c6c6c6;}
     .banner-logo{max-height:88px;}
     @media (min-width:576px){ .banner-logo{max-height:120px;} }
-    @media (min-width:992px){ .banner-logo{max-height:288px;} } /* 4× desktop */
+    @media (min-width:992px){ .banner-logo{max-height:288px;} } /* ~4× desktop */
 
-    /* Middle header: same color as cards, text forced white */
+    /* Middle header: same color as cards, force white */
     .mid-hero{background:var(--card);border-bottom:1px solid var(--border);}
     .mid-hero .page-header, .mid-hero .page-header *{color:#fff !important;}
 
@@ -66,9 +66,9 @@
     .form-control::placeholder{color:#b8c1cc;}
     .btn{border-radius:12px;}
 
-    /* Critical readability */
+    /* Readability fixes */
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;color:var(--fg-strong)!important;}
-    .card .small,.card small{color:var(--fg)!important;}    /* Account/Network/Balance */
+    .card .small,.card small{color:var(--fg)!important;}    /* Account/Network/Balance text */
     .form-check-label{color:var(--fg)!important;}           /* Use tokens (with bonus) */
 
     /* Tables */
@@ -99,7 +99,7 @@
   </div>
 </div>
 
-<!-- ===== Middle header (same as cards, white text) ===== -->
+<!-- ===== Middle header (card color + white text) ===== -->
 <div class="mid-hero">
   <div class="container py-3">
     <header class="page-header">
@@ -396,11 +396,13 @@ contract MegaCounter {
         </div>
       </div>
 
-      <!-- ===================== TWEET ===================== -->
+      <!-- ===================== TWEET (5 variations) ===================== -->
       <div class="tab-pane fade" id="pane-tweet" role="tabpanel" aria-labelledby="tab-tweet">
         <div class="card p-3 mb-3">
           <h2 class="h5 mb-2">Tweet Badge Generator</h2>
-          <p class="muted mb-3">Bundle your repo/demo and MegaETH testnet tx hashes into a clean tweet.</p>
+          <p class="muted mb-3">Creates 5 variations with the required intro + your live calculator numbers.</p>
+
+          <!-- Optional metadata (kept for future use) -->
           <div class="row g-3">
             <div class="col-md-4">
               <label class="form-label">Your repo URL (optional)</label>
@@ -415,17 +417,56 @@ contract MegaCounter {
               <input id="xHandle" class="form-control" placeholder="@yourhandle">
             </div>
             <div class="col-12">
-              <label class="form-label">Recent MegaETH tx hashes (newline-separated)</label>
-              <textarea id="txHashes" class="form-control mono" rows="4" placeholder="0xabc...\n0xdef..."></textarea>
+              <label class="form-label">Recent MegaETH tx hashes (optional, newline-separated)</label>
+              <textarea id="txHashes" class="form-control mono" rows="2" placeholder="0xabc...\n0xdef..."></textarea>
             </div>
-            <div class="col-12 d-flex gap-2 flex-wrap">
-              <button id="btnBuildTweet" class="btn btn-primary">Build tweet</button>
-              <button id="btnCopyTweet" class="btn btn-outline-light">Copy text</button>
-              <a id="tweetLink" class="btn btn-success" target="_blank" rel="noreferrer">Open tweet</a>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap my-3">
+            <button id="btnBuildTweet" class="btn btn-primary">Build 5 posts</button>
+          </div>
+
+          <!-- Five outputs -->
+          <div id="tweetSet">
+            <!-- Post #1 -->
+            <div class="border rounded p-2 mb-3">
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut1">Copy text</button>
+                <a class="btn btn-success btn-sm" id="tweetLink1" target="_blank" rel="noreferrer">Open tweet</a>
+              </div>
+              <textarea id="tweetOut1" class="form-control mono" rows="7" readonly></textarea>
             </div>
-            <div class="col-12">
-              <label class="form-label">Tweet preview</label>
-              <textarea id="tweetOut" class="form-control mono" rows="7" readonly></textarea>
+            <!-- Post #2 -->
+            <div class="border rounded p-2 mb-3">
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut2">Copy text</button>
+                <a class="btn btn-success btn-sm" id="tweetLink2" target="_blank" rel="noreferrer">Open tweet</a>
+              </div>
+              <textarea id="tweetOut2" class="form-control mono" rows="7" readonly></textarea>
+            </div>
+            <!-- Post #3 -->
+            <div class="border rounded p-2 mb-3">
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut3">Copy text</button>
+                <a class="btn btn-success btn-sm" id="tweetLink3" target="_blank" rel="noreferrer">Open tweet</a>
+              </div>
+              <textarea id="tweetOut3" class="form-control mono" rows="7" readonly></textarea>
+            </div>
+            <!-- Post #4 -->
+            <div class="border rounded p-2 mb-3">
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut4">Copy text</button>
+                <a class="btn btn-success btn-sm" id="tweetLink4" target="_blank" rel="noreferrer">Open tweet</a>
+              </div>
+              <textarea id="tweetOut4" class="form-control mono" rows="7" readonly></textarea>
+            </div>
+            <!-- Post #5 -->
+            <div class="border rounded p-2 mb-1">
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut5">Copy text</button>
+                <a class="btn btn-success btn-sm" id="tweetLink5" target="_blank" rel="noreferrer">Open tweet</a>
+              </div>
+              <textarea id="tweetOut5" class="form-control mono" rows="7" readonly></textarea>
             </div>
           </div>
         </div>
@@ -634,7 +675,7 @@ waitForEthers().then(() => {
     const v = vals();
     if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) {
       ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
-      document.getElementById('breakevenRows').innerHTML = ''; buildTweetPreview(); return;
+      document.getElementById('breakevenRows').innerHTML = ''; buildTweetSet && buildTweetSet(); return;
     }
     const effPrice=v.price*(1-v.discount), tokensBase=v.bid/effPrice, tokensBonus=tokensBase*(1+v.bonus);
     const tgePrice=v.fdv/v.supply, valBase=tokensBase*tgePrice, valBonus=tokensBonus*tgePrice;
@@ -667,7 +708,7 @@ waitForEthers().then(() => {
       </tr>`;
     }).join('');
 
-    buildTweetPreview();
+    buildTweetSet && buildTweetSet();
   }
 
   // CSV
@@ -698,7 +739,7 @@ waitForEthers().then(() => {
     ];
     [-0.30,0,0.50].forEach(chg=>{
       const endValue=v.bid*Math.pow(1+(v.apy/12),12)*(1+chg);
-      const priceReq=endValue/(tokensBonus>0?tokensBonus:tokensBase);
+      const priceReq=endValue/((v.bonus>0?tokensBonus:tokensBase)||1);
       rows.push([ (chg*100)+'%', endValue, priceReq, priceReq*v.supply ]);
     });
 
@@ -713,50 +754,88 @@ waitForEthers().then(() => {
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   });
 
-  // Tweet badge
-  function buildTweetPreview(){
-    const v=vals();
-    const effPrice=(v.price>0)?v.price*(1-v.discount):NaN;
-    const tokens=(v.bid>0 && effPrice>0)?v.bid/effPrice:0;
-    const tgePrice=(v.fdv>0 && v.supply>0)?v.fdv/v.supply:0;
-    const roi=(tokens*tgePrice>0 && v.bid>0)?((tokens*tgePrice - v.bid)/v.bid*100):0;
-
-    const repo=document.getElementById('repoUrl').value?.trim();
-    const site=document.getElementById('siteUrl').value?.trim();
-    const handle=document.getElementById('xHandle').value?.trim();
-    const txs=document.getElementById('txHashes').value?.trim().split('\n').filter(Boolean)||[];
-    const txLine=txs.length?`Tx: ${txs.slice(0,5).join(' ')}`:'';
-
-    const lines=[
-      `🧪 MegaETH Testnet — activity + MEGA calculator`,
-      `Bid: $${(v.bid||0).toLocaleString()} • Lock: ${((v.discount||0)*100).toFixed(0)}% • Eff: $${isFinite(effPrice)?effPrice.toFixed(5):'—'}`,
-      `Tokens≈ ${isFinite(tokens)?Math.round(tokens).toLocaleString():'—'} • TGE FDV $${(v.fdv||0).toLocaleString()} • TGE px≈ $${isFinite(tgePrice)?tgePrice.toFixed(3):'—'}`,
-      `Est. TGE ROI≈ ${isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(1)+'%':'—'}`,
-      repo?`Repo: ${repo}`:null, site?`Live: ${site}`:null, txLine||null, handle?`cc ${handle}`:null,
-      `#MegaETH #L2 #web3`
-    ].filter(Boolean);
-    document.getElementById('tweetOut').value=lines.join('\n');
-    document.getElementById('tweetLink').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(lines.join('\n'));
-  }
-  document.getElementById('btnBuildTweet').addEventListener('click', buildTweetPreview);
-  document.getElementById('btnCopyTweet').addEventListener('click', async ()=>{
-    try { await navigator.clipboard.writeText(document.getElementById('tweetOut').value); alertBox('Tweet copied to clipboard!','success'); }
-    catch(e){ alertBox('Copy failed: '+(e?.message||e),'danger'); }
-  });
-
   // React to account/network changes
   if (window.ethereum) {
     window.ethereum.on('accountsChanged', () => location.reload());
     window.ethereum.on('chainChanged', () => location.reload());
   }
-
-  // init
-  recalc();
 })();
 }).catch(err=>{
   const alerts=document.getElementById('alerts');
   if(alerts){alerts.innerHTML=`<div class="alert alert-danger">Failed to load ethers: ${err.message}. Check the UMD script and redeploy.</div>`;}
 });
+</script>
+
+<!-- ===== Tweet builder (5 variations, exact format) ===== -->
+<script>
+  // Format helpers: thin-space (U+202F) thousands, fixed decimals where needed
+  const thinSpace = '\u202F';
+  const withThinSpaces = (s) => s.replace(/,/g, thinSpace);
+  const fmtThin = (n, opts) => withThinSpaces(Number(n).toLocaleString('en-US', opts));
+  const fmtMoneyNoCentsThin = (n) => '$' + fmtThin(n, { maximumFractionDigits: 0 });
+  const fmtMoneyThin = (n, min=0, max=2) => '$' + fmtThin(n, { minimumFractionDigits:min, maximumFractionDigits:max });
+  const fmtNumThin = (n, min=0, max=0) => fmtThin(n, { minimumFractionDigits:min, maximumFractionDigits:max });
+
+  function currentCalc(){
+    const bid = +(document.getElementById('bid')?.value || 0);
+    const price = +(document.getElementById('price')?.value || 0);
+    const discount = Math.min(Math.max(+(document.getElementById('discount')?.value || 0),0),50) / 100;
+    const supply = +(document.getElementById('supply')?.value || 0);
+    const fdv = +(document.getElementById('fdvCustom')?.value || 0);
+    const eff = price * (1 - discount);
+    const tokens = (eff>0) ? (bid/eff) : 0;
+    const tgePx = (supply>0) ? (fdv/supply) : 0;
+    const roiPct = (bid>0) ? (((tokens*tgePx) - bid)/bid*100) : 0;
+    return { bid, discountPct: discount*100, eff, tokens, fdv, tgePx, roiPct };
+  }
+
+  // Five intro lines — include @megaeth_labs and $MEGA
+  const INTRO_BODIES = [
+    "I have farmed @megaeth_labs testnet, calculated my dream allocation and even convinced myself to dump my dead bags to buy some $MEGA!",
+    "Grinding @megaeth_labs testnet, ran the calculator, and rotating out of the fossils into $MEGA.",
+    "After weeks on @megaeth_labs testnet and a few calculator runs, I’m reallocating the bag — hello $MEGA.",
+    "Built my flow on @megaeth_labs, crunched the numbers, and the conviction is set: going heavier on $MEGA.",
+    "Farming @megaeth_labs testnet + the airdrop tool = I’m ditching the dead weight for $MEGA."
+  ];
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}
+    return a;
+  }
+
+  function buildPost(bodyLine2, vals){
+    // Exact structure requested
+    const L1 = "🤖 Mega Engage!";
+    const L2 = bodyLine2; // includes @megaeth_labs and $MEGA
+    const L3 = `Bid: ${fmtMoneyNoCentsThin(vals.bid)} • Lock: ${fmtNumThin(vals.discountPct,0,0)}% • Eff: ${fmtMoneyThin(vals.eff,5,5)}`;
+    const L4 = `Tokens≈ ${fmtNumThin(Math.round(vals.tokens))} • TGE FDV ${fmtMoneyNoCentsThin(vals.fdv)} • TGE px≈ ${fmtMoneyThin(vals.tgePx,3,3)}`;
+    const sign = vals.roiPct>=0?'+':'';
+    const L5 = `Est. TGE ROI≈ ${sign}${fmtNumThin(Math.abs(vals.roiPct),1,1)}%`;
+    const L6 = `#MegaETH #L2 #web3 #MegaEngage`;
+    return [L1,L2,L3,L4,L5,L6].join('\n');
+  }
+
+  function buildTweetSet(){
+    const vals = currentCalc();
+    const intros = shuffle(INTRO_BODIES).slice(0,5);
+    const posts = intros.map(intro => buildPost(intro, vals));
+
+    posts.forEach((text, i) => {
+      const idx = i+1;
+      const out = document.getElementById('tweetOut'+idx);
+      const a  = document.getElementById('tweetLink'+idx);
+      if (out) out.value = text;
+      if (a)   a.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
+    });
+  }
+
+  // Expose for recalc() to refresh tweets after inputs change:
+  window.buildTweetSet = buildTweetSet;
+
+  // Button + automatic initial build
+  document.getElementById('btnBuildTweet')?.addEventListener('click', buildTweetSet);
+  buildTweetSet();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
