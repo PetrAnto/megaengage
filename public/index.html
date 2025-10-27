@@ -8,121 +8,98 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Ethers (UMD) so window.ethers exists -->
+  <!-- Ethers (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
   <script>if(typeof window.ethers==='undefined'){var s=document.createElement('script');s.src='https://unpkg.com/ethers@6.13.2/dist/ethers.umd.min.js';document.head.appendChild(s);}</script>
 
   <style>
-    /* ---------- Theme ---------- */
     :root{
-      --page-top:#d2d2d2;     /* banner section */
-      --page-bottom:#606060;  /* main background */
+      --page-top:#d2d2d2;     /* banner */
+      --page-bottom:#606060;  /* main bg */
       --card:#222831;         /* dark grey card */
       --border:#3a414b;
-      --fg:#f7f9fc;           /* text inside cards */
-      --fg-strong:#ffffff;    /* headings/KPIs */
-      --fg-muted:#d7dee7;     /* labels inside cards */
+      --fg:#f7f9fc;
+      --fg-strong:#fff;
+      --fg-muted:#d7dee7;
       --accent:#0d6efd;
-      --thead:#ffffff;        /* table header text */
+      --thead:#fff;
       --thead-bg:rgba(255,255,255,.12);
     }
     html,body{height:100%}
     body{margin:0;background:var(--page-bottom);color:#111;}
 
-    /* Top banner */
     .top-shell{background:var(--page-top);}
     .banner-wrap{background:var(--page-top);border-bottom:1px solid #c6c6c6;}
-    .banner-logo{max-height:88px;}
-    @media (min-width:576px){ .banner-logo{max-height:120px;} }
-    @media (min-width:992px){ .banner-logo{max-height:288px;} } /* ~4× desktop */
+    .banner-logo{max-height:88px}
+    @media (min-width:576px){.banner-logo{max-height:120px}}
+    @media (min-width:992px){.banner-logo{max-height:288px}} /* ~4x desktop */
 
-    /* Middle header: same color as cards, force white */
-    .mid-hero{background:var(--card);border-bottom:1px solid var(--border);}
-    .mid-hero .page-header, .mid-hero .page-header *{color:#fff !important;}
+    .mid-hero{background:var(--card);border-bottom:1px solid var(--border)}
+    .mid-hero .page-header,* .mid-hero .page-header{color:#fff!important}
 
-    /* Tabs area (dark bg) */
-    .content-shell{background:var(--page-bottom);}
+    .content-shell{background:var(--page-bottom)}
 
-    /* Tabs */
-    .nav-tabs{border-bottom:0;overflow-x:auto;white-space:nowrap;}
-    .nav-tabs .nav-link{border:0;color:#e9eef5;}
-    .nav-tabs .nav-link.active{color:#fff;background:transparent;border-bottom:2px solid var(--accent);}
+    .nav-tabs{border-bottom:0;overflow-x:auto;white-space:nowrap}
+    .nav-tabs .nav-link{border:0;color:#e9eef5}
+    .nav-tabs .nav-link.active{color:#fff;background:transparent;border-bottom:2px solid var(--accent)}
 
-    /* Cards */
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:16px;
-      box-shadow:0 6px 18px rgba(0,0,0,.12);
-      color:var(--fg);
-    }
-    .card h1,.card h2,.card h3,.card h4,.card h5,.card h6{color:var(--fg-strong);}
-    .card .form-label{color:var(--fg-muted);}
-    .muted{color:var(--fg-muted)!important;}
-    .divider{height:1px;background:var(--border);margin:1rem 0;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.12);color:var(--fg)}
+    .card h1,.card h2,.card h3,.card h4,.card h5,.card h6{color:var(--fg-strong)}
+    .card .form-label{color:var(--fg-muted)}
+    .muted{color:var(--fg-muted)!important}
+    .divider{height:1px;background:var(--border);margin:1rem 0}
 
-    /* Inputs on dark cards */
-    .form-control,.form-select{background:#0f141a;border:1px solid var(--border);color:var(--fg);}
-    .form-control::placeholder{color:#b8c1cc;}
-    .btn{border-radius:12px;}
+    .form-control,.form-select{background:#0f141a;border:1px solid var(--border);color:var(--fg)}
+    .form-control::placeholder{color:#b8c1cc}
+    .btn{border-radius:12px}
 
-    /* Readability fixes */
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;color:var(--fg-strong)!important;}
-    .card .small,.card small{color:var(--fg)!important;}    /* Account/Network/Balance text */
-    .form-check-label{color:var(--fg)!important;}           /* Use tokens (with bonus) */
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;color:var(--fg-strong)!important}
+    .card .small,.card small{color:var(--fg)!important}
+    .form-check-label{color:var(--fg)!important}
 
-    /* Tables — bright text on dark background */
     .table{
-      --bs-table-color:#f7f9fc;
-      --bs-table-bg:transparent;
-      --bs-table-border-color:#3a414b;
-      --bs-table-striped-bg:rgba(255,255,255,.06);
-      --bs-table-striped-color:#f7f9fc;
-      --bs-table-hover-bg:rgba(255,255,255,.10);
-      --bs-table-hover-color:#f7f9fc;
-      color:var(--bs-table-color)!important;
-      background-color:var(--bs-table-bg)!important;
+      --bs-table-color:#f7f9fc;--bs-table-bg:transparent;--bs-table-border-color:#3a414b;
+      --bs-table-striped-bg:rgba(255,255,255,.06);--bs-table-striped-color:#f7f9fc;
+      --bs-table-hover-bg:rgba(255,255,255,.10);--bs-table-hover-color:#f7f9fc;
+      color:var(--bs-table-color)!important;background-color:var(--bs-table-bg)!important
     }
-    .table thead th{
-      color:var(--thead)!important;
-      background:var(--thead-bg)!important;
-      border-bottom-color:#3a414b!important;
-      font-weight:600;
-    }
-    .table tbody td,
-    .table tbody th,
-    .table tbody tr{
-      color:#f7f9fc!important;
-      opacity:1!important;
-      background:transparent!important;
-      border-color:#3a414b!important;
-    }
+    .table thead th{color:var(--thead)!important;background:var(--thead-bg)!important;border-bottom-color:#3a414b!important;font-weight:600}
+    .table tbody td,.table tbody th,.table tbody tr{color:#f7f9fc!important;background:transparent!important;border-color:#3a414b!important}
     .table-responsive{ -webkit-overflow-scrolling:touch; background:transparent!important; }
 
-    /* Layout helpers */
-    .stack > .card + .card{margin-top:1rem;} /* vertical spacing */
+    /* Meme tiles */
+    .meme{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 6px 18px rgba(0,0,0,.12);background:#000}
+    .meme img{width:100%;height:100%;object-fit:cover;display:block}
+    .meme-16x9{aspect-ratio:16/9}
+    .meme-4x3{aspect-ratio:4/3}
+    .meme-square{aspect-ratio:1/1}
+    .meme-tall{aspect-ratio:3/4}
+    .meme-hide-sm{display:block}
+    @media (max-width: 991.98px){.meme-hide-sm{display:none!important}} /* hide some tiles on mobile */
 
-    /* --- Mobile tap/overlay fixes for coin selector --- */
-    #coinSelect{ position:relative; z-index:5; pointer-events:auto; }
-    #pane-calc .card{ overflow:visible; }
-    .table-responsive{ position:relative; z-index:1; }
+    /* ensure selector above tables on mobile */
+    #coinSelect{z-index:5;position:relative}
+    #pane-calc .card{overflow:visible}
+
+    /* vertical stack spacing helper */
+    .stack > * + *{margin-top:1rem}
   </style>
 </head>
 <body>
 
-<!-- ===== Top banner (light) ===== -->
+<!-- ===== Top banner ===== -->
 <div class="top-shell">
   <div class="banner-wrap text-center py-3">
     <picture>
       <source src="assets/megaengage-banner.webp" type="image/webp">
       <img src="assets/megaengage-banner.webp"
-           onerror="this.onerror=null;this.src='assets/megaengage-banner.png';"
+           onerror="this.onerror=null;this.src='assets/megaengage-banner.jpg';"
            alt="MegaEngage" class="img-fluid banner-logo">
     </picture>
   </div>
 </div>
 
-<!-- ===== Middle header (card color + white text) ===== -->
+<!-- ===== Middle header ===== -->
 <div class="mid-hero">
   <div class="container py-3">
     <header class="page-header">
@@ -132,104 +109,91 @@
   </div>
 </div>
 
-<!-- ===== Main (dark) ===== -->
+<!-- ===== Main ===== -->
 <div class="content-shell">
   <div class="container pt-3">
 
-    <!-- Tabs -->
     <ul class="nav nav-tabs mb-3" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="tab-engage" data-bs-toggle="tab" data-bs-target="#pane-engage" type="button" role="tab">Engage dApp</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="tab-calc" data-bs-toggle="tab" data-bs-target="#pane-calc" type="button" role="tab">Airdrop Calculator</button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="tab-tweet" data-bs-toggle="tab" data-bs-target="#pane-tweet" type="button" role="tab">Tweet Badge</button>
-      </li>
+      <li class="nav-item"><button class="nav-link active" id="tab-engage" data-bs-toggle="tab" data-bs-target="#pane-engage" type="button">Engage dApp</button></li>
+      <li class="nav-item"><button class="nav-link" id="tab-calc" data-bs-toggle="tab" data-bs-target="#pane-calc" type="button">Airdrop Calculator</button></li>
+      <li class="nav-item"><button class="nav-link" id="tab-tweet" data-bs-toggle="tab" data-bs-target="#pane-tweet" type="button">Tweet Badge</button></li>
     </ul>
 
     <div id="alerts"></div>
 
     <div class="tab-content">
-      <!-- ===================== ENGAGE ===================== -->
-      <div class="tab-pane fade show active" id="pane-engage" role="tabpanel" aria-labelledby="tab-engage">
 
+      <!-- ================= ENGAGE ================= -->
+      <div class="tab-pane fade show active" id="pane-engage">
         <div class="row g-3">
-          <!-- LEFT column: stack 1), 2), 3) -->
-          <div class="col-12 col-lg-7 stack">
-
-            <!-- 1) Connect / Add -->
-            <div class="card p-3">
-              <h2 class="h5 mb-3">1) Connect & Add MegaETH Testnet</h2>
-              <p class="muted mb-2">Chain ID <code>6342</code> · RPC <code>https://carrot.megaeth.com/rpc</code> · Explorer <code>megaexplorer.xyz</code></p>
-              <div class="d-flex gap-2 flex-wrap">
-                <button id="btnConnect" class="btn btn-primary">Connect Wallet</button>
-                <button id="btnAddNet" class="btn btn-outline-light">Add Network</button>
-                <button id="btnSwitch" class="btn btn-outline-light">Switch to MegaETH</button>
-              </div>
-              <div class="mt-3 small">
-                <div>Account: <span id="account" class="mono">—</span></div>
-                <div>Network: <span id="network" class="mono">—</span></div>
-                <div>Balance: <span id="balance" class="mono">—</span></div>
-              </div>
-              <div class="divider"></div>
-              <p class="muted mb-1">Get test ETH (faucet):</p>
-              <ul class="mb-0">
-                <li><a href="https://testnet.megaeth.com/" target="_blank" rel="noreferrer">Official testnet portal</a></li>
-                <li><a href="https://docs.megaeth.com/faucet" target="_blank" rel="noreferrer">Docs: Faucet</a></li>
-              </ul>
+          <!-- Left meme column -->
+          <div class="col-12 col-lg-6 stack">
+            <div class="meme meme-16x9">
+              <img loading="lazy" src="assets/memes/engage_bunny_noservices.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/engage_bunny_noservices.jpg';"
+                   alt="Mega bunny lore: No sexual services">
             </div>
-
-            <!-- 2) Test Tx -->
-            <div class="card p-3">
-              <h2 class="h5 mb-3">2) Fire a Test Transaction</h2>
-              <p class="muted">Sends a tiny self-transfer on MegaETH Testnet (needs faucet ETH).</p>
-              <div class="row g-2">
-                <div class="col-6">
-                  <label class="form-label">Amount (ETH)</label>
-                  <input id="txAmount" class="form-control" value="0.00001"/>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Max Fee (gwei)</label>
-                  <input id="maxFee" class="form-control" value="0.1"/>
-                </div>
-              </div>
-              <button id="btnSendTx" class="btn btn-success mt-2">Send Test Tx</button>
-              <div class="mt-3 small mono" id="txStatus" style="min-height:1.5rem;"></div>
+            <div class="meme meme-16x9 meme-hide-sm">
+              <img loading="lazy" src="assets/memes/engage_lan_cafe.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/engage_lan_cafe.jpg';"
+                   alt="LAN cafe nostalgia">
             </div>
+          </div>
 
-            <!-- 3) Contract -->
-            <div class="card p-3">
-              <h2 class="h5 mb-3">3) Interact with your Counter Contract</h2>
-              <p class="muted">Deploy once in Remix (instructions below), paste the address here, then <strong>Read / increment()</strong>.</p>
-
-              <div class="row g-2 align-items-end">
-                <div class="col-md-6">
-                  <label class="form-label">Counter Contract Address</label>
-                  <input id="ctrAddr" class="form-control" placeholder="0x..."/>
+          <!-- Right cards column (1,2,3 stacked + 4) -->
+          <div class="col-12 col-lg-6">
+            <div class="stack">
+              <!-- 1) Connect -->
+              <div class="card p-3">
+                <h2 class="h5 mb-3">1) Connect & Add MegaETH Testnet</h2>
+                <p class="muted mb-2">Chain ID <code>6342</code> · RPC <code>https://carrot.megaeth.com/rpc</code> · Explorer <code>megaexplorer.xyz</code></p>
+                <div class="d-flex gap-2 flex-wrap">
+                  <button id="btnConnect" class="btn btn-primary">Connect Wallet</button>
+                  <button id="btnAddNet" class="btn btn-outline-light">Add Network</button>
+                  <button id="btnSwitch" class="btn btn-outline-light">Switch to MegaETH</button>
                 </div>
-                <div class="col-md-6 d-flex gap-2 flex-wrap">
-                  <button id="btnLoadCtr" class="btn btn-outline-light">Load Contract</button>
-                  <button id="btnRead" class="btn btn-secondary">Read count()</button>
-                  <input id="msg" class="form-control" placeholder="message for increment()" style="max-width:280px;">
-                  <button id="btnInc" class="btn btn-warning">increment(message)</button>
+                <div class="mt-3 small">
+                  <div>Account: <span id="account" class="mono">—</span></div>
+                  <div>Network: <span id="network" class="mono">—</span></div>
+                  <div>Balance: <span id="balance" class="mono">—</span></div>
                 </div>
+                <div class="divider"></div>
+                <p class="muted mb-1">Get test ETH (faucet):</p>
+                <ul class="mb-0">
+                  <li><a href="https://testnet.megaeth.com/" target="_blank" rel="noreferrer">Official testnet portal</a></li>
+                  <li><a href="https://docs.megaeth.com/faucet" target="_blank" rel="noreferrer">Docs: Faucet</a></li>
+                </ul>
               </div>
 
-              <div class="mt-3 small mono" id="ctrStatus" style="min-height:1.5rem;"></div>
+              <!-- 2) Test Tx -->
+              <div class="card p-3">
+                <h2 class="h5 mb-3">2) Fire a Test Transaction</h2>
+                <p class="muted">Sends a tiny self-transfer on MegaETH Testnet (needs faucet ETH).</p>
+                <div class="row g-2">
+                  <div class="col-6"><label class="form-label">Amount (ETH)</label><input id="txAmount" class="form-control" value="0.00001"/></div>
+                  <div class="col-6"><label class="form-label">Max Fee (gwei)</label><input id="maxFee" class="form-control" value="0.1"/></div>
+                </div>
+                <button id="btnSendTx" class="btn btn-success mt-2">Send Test Tx</button>
+                <div class="mt-3 small mono" id="txStatus" style="min-height:1.5rem;"></div>
+              </div>
 
-              <div class="divider"></div>
-              <h3 class="h6">How to deploy in Remix</h3>
-              <ol class="mb-3">
-                <li>Open <a href="https://remix.ethereum.org" target="_blank" rel="noreferrer">Remix IDE</a> and create <code>MegaCounter.sol</code>.</li>
-                <li>Paste the code below. Compile with Solidity <strong>0.8.20+</strong>.</li>
-                <li>In <em>Deploy & run transactions</em>, select <strong>Injected Provider – MetaMask</strong> and switch MetaMask to <strong>MegaETH Testnet</strong> (chainId 6342).</li>
-                <li>Click <strong>Deploy</strong>, copy the contract address, paste it above, then try <strong>Read</strong> / <strong>increment()</strong>.</li>
-              </ol>
-              <a class="btn btn-sm btn-primary mb-2" href="https://remix.ethereum.org" target="_blank" rel="noreferrer">Open Remix</a>
-              <details>
-                <summary class="mb-2">Show <code>MegaCounter.sol</code></summary>
+              <!-- 3) Contract -->
+              <div class="card p-3">
+                <h2 class="h5 mb-3">3) Interact with your Counter Contract</h2>
+                <p class="muted">Deploy once in Remix (instructions below), paste the address here, then <strong>Read / increment()</strong>.</p>
+                <div class="row g-2 align-items-end">
+                  <div class="col-md-6"><label class="form-label">Counter Contract Address</label><input id="ctrAddr" class="form-control" placeholder="0x..."/></div>
+                  <div class="col-md-6 d-flex gap-2 flex-wrap">
+                    <button id="btnLoadCtr" class="btn btn-outline-light">Load Contract</button>
+                    <button id="btnRead" class="btn btn-secondary">Read count()</button>
+                    <input id="msg" class="form-control" placeholder="message for increment()" style="max-width:260px">
+                    <button id="btnInc" class="btn btn-warning">increment(message)</button>
+                  </div>
+                </div>
+                <div class="mt-3 small mono" id="ctrStatus" style="min-height:1.5rem;"></div>
+                <div class="divider"></div>
+                <details>
+                  <summary class="mb-2">Show <code>MegaCounter.sol</code> (Solidity 0.8.20+)</summary>
 <pre class="mono" style="white-space:pre-wrap;background:#0f141a;border:1px solid var(--border);border-radius:12px;padding:12px;">
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
@@ -237,142 +201,99 @@ pragma solidity ^0.8.20;
 contract MegaCounter {
     uint256 public count;
     event Increment(address indexed by, uint256 newCount, string message);
-
     function increment(string calldata message) external {
         unchecked { count += 1; }
         emit Increment(msg.sender, count, message);
     }
 }
 </pre>
-              </details>
-            </div>
-          </div>
+                </details>
+              </div>
 
-          <!-- RIGHT column -->
-          <div class="col-12 col-lg-5">
-            <!-- 4) Bad Bunnz -->
-            <div class="card p-3 mb-3">
-              <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
-              <p class="muted mb-3">
-                Bad Bunnz is <em>probably</em> the leading web3 project on MegaETH right now.
-              </p>
-              <a class="btn btn-success" href="https://opensea.io/collection/bad-bunnz" target="_blank" rel="noreferrer">Browse on OpenSea</a>
-              <p class="muted mt-3 mb-0">Note: embedding marketplaces is often blocked by browser security; direct link recommended.</p>
+              <!-- 4) Bad Bunnz -->
+              <div class="card p-3">
+                <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
+                <p class="muted mb-3">Bad Bunnz is <em>probably</em> the leading web3 project on MegaETH right now.</p>
+                <a class="btn btn-success" href="https://opensea.io/collection/bad-bunnz" target="_blank" rel="noreferrer">Browse on OpenSea</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ===================== CALCULATOR ===================== -->
-      <div class="tab-pane fade" id="pane-calc" role="tabpanel" aria-labelledby="tab-calc">
-        <!-- Inputs (no coin/APY now) -->
-        <div class="card p-3 mb-3">
-          <h2 class="h5 mb-3">MEGA Airdrop / Allocation Calculator</h2>
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label">Bid amount (USDT)</label>
-              <input id="bid" type="number" class="form-control" value="2700" min="0" step="1">
+      <!-- ================= CALCULATOR ================= -->
+      <div class="tab-pane fade" id="pane-calc">
+        <!-- Row 1: big meme (left) + inputs (right) -->
+        <div class="row g-3 align-items-stretch">
+          <div class="col-12 col-lg-6">
+            <div class="meme meme-4x3">
+              <img loading="lazy" src="assets/memes/calc_left_operator.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/calc_left_operator.jpg';"
+                   alt="Operator pointing at computers">
             </div>
-            <div class="col-md-3">
-              <label class="form-label">Clearing price P ($/MEGA)</label>
-              <input id="price" type="number" class="form-control" value="0.0999" min="0.000001" step="0.0001">
-              <div class="form-text muted">Auction price; cap = 0.0999</div>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Lock discount (%)</label>
-              <div class="input-group">
-                <input id="discount" type="number" class="form-control" value="10" min="0" max="50" step="1">
-                <button id="toggleLock" class="btn btn-outline-light">Toggle lock</button>
+          </div>
+          <div class="col-12 col-lg-6">
+            <div class="card p-3 h-100">
+              <h2 class="h5 mb-3">MEGA Airdrop / Allocation Calculator</h2>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label">Bid amount (USDT)</label><input id="bid" type="number" class="form-control" value="2700"></div>
+                <div class="col-md-6"><label class="form-label">Clearing price P ($/MEGA)</label><input id="price" type="number" class="form-control" value="0.0999" step="0.0001"><div class="form-text muted">Auction price; cap = 0.0999</div></div>
+                <div class="col-md-6"><label class="form-label">Total supply (MEGA)</label><input id="supply" type="number" class="form-control" value="10000000000"></div>
+                <div class="col-md-6"><label class="form-label">TGE FDV (preset)</label><select id="fdvPreset" class="form-select"><option value="1000000000">$1.0B</option><option value="1500000000">$1.5B</option><option value="2000000000" selected>$2.0B</option><option value="3000000000">$3.0B</option><option value="5000000000">$5.0B</option><option value="custom">Custom below…</option></select></div>
+                <div class="col-md-6"><label class="form-label">TGE FDV (custom, $)</label><input id="fdvCustom" type="number" class="form-control" value="2000000000"></div>
+                <div class="col-md-6"><label class="form-label">Lock discount (%)</label><div class="input-group"><input id="discount" type="number" class="form-control" value="10"><button id="toggleLock" class="btn btn-outline-light">Toggle lock</button></div><div class="form-text muted">10% if 1-year lock</div></div>
+                <div class="col-md-6"><label class="form-label">Bonus tokens (%)</label><input id="bonus" type="number" class="form-control" value="0"><div class="form-text muted">Leaderboard bonus at TGE</div></div>
               </div>
-              <div class="form-text muted">10% if 1-year lock</div>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Bonus tokens (%)</label>
-              <input id="bonus" type="number" class="form-control" value="0" min="0" max="100" step="1">
-              <div class="form-text muted">Leaderboard bonus at TGE</div>
-            </div>
-
-            <div class="col-md-3">
-              <label class="form-label">Total supply (MEGA)</label>
-              <input id="supply" type="number" class="form-control" value="10000000000" step="1000000">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">TGE FDV (preset)</label>
-              <select id="fdvPreset" class="form-select">
-                <option value="1000000000">$1.0B</option>
-                <option value="1500000000">$1.5B</option>
-                <option value="2000000000" selected>$2.0B</option>
-                <option value="3000000000">$3.0B</option>
-                <option value="5000000000">$5.0B</option>
-                <option value="custom">Custom below…</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">TGE FDV (custom, $)</label>
-              <input id="fdvCustom" type="number" class="form-control" value="2000000000" step="50000000">
             </div>
           </div>
         </div>
 
-        <!-- Results -->
-        <div class="row g-3">
+        <!-- Row 2: Allocation card + two memes -->
+        <div class="row g-3 mt-1">
           <div class="col-lg-6">
             <div class="card p-3 h-100">
               <h3 class="h6 mb-3">Allocation & ROI (at TGE)</h3>
               <div class="row g-2">
-                <div class="col-6">
-                  <div class="muted">Effective paid price</div>
-                  <div class="h5 mono" id="effPrice">—</div>
-                </div>
-                <div class="col-6">
-                  <div class="muted">TGE price (= FDV / supply)</div>
-                  <div class="h5 mono" id="tgePrice">—</div>
-                </div>
-                <div class="col-6">
-                  <div class="muted">Tokens (no bonus)</div>
-                  <div class="h5 mono" id="tokensBase">—</div>
-                </div>
-                <div class="col-6">
-                  <div class="muted">Tokens (with bonus)</div>
-                  <div class="h5 mono" id="tokensBonus">—</div>
-                </div>
+                <div class="col-6"><div class="muted">Effective paid price</div><div class="h5 mono" id="effPrice">—</div></div>
+                <div class="col-6"><div class="muted">TGE price (= FDV / supply)</div><div class="h5 mono" id="tgePrice">—</div></div>
+                <div class="col-6"><div class="muted">Tokens (no bonus)</div><div class="h5 mono" id="tokensBase">—</div></div>
+                <div class="col-6"><div class="muted">Tokens (with bonus)</div><div class="h5 mono" id="tokensBonus">—</div></div>
               </div>
               <hr>
               <div class="row g-2">
-                <div class="col-6">
-                  <div class="muted">Value @ TGE (no bonus)</div>
-                  <div class="h5 mono" id="valBase">—</div>
-                  <div class="muted">ROI %</div>
-                  <div class="h6 mono" id="roiBase">—</div>
-                </div>
-                <div class="col-6">
-                  <div class="muted">Value @ TGE (with bonus)</div>
-                  <div class="h5 mono" id="valBonus">—</div>
-                  <div class="muted">ROI %</div>
-                  <div class="h6 mono" id="roiBonus">—</div>
-                </div>
+                <div class="col-6"><div class="muted">Value @ TGE (no bonus)</div><div class="h5 mono" id="valBase">—</div><div class="muted">ROI %</div><div class="h6 mono" id="roiBase">—</div></div>
+                <div class="col-6"><div class="muted">Value @ TGE (with bonus)</div><div class="h5 mono" id="valBonus">—</div><div class="muted">ROI %</div><div class="h6 mono" id="roiBonus">—</div></div>
               </div>
-              <div class="mt-3">
-                <button id="btnCSV" class="btn btn-outline-light btn-sm">Download CSV</button>
-              </div>
+              <div class="mt-3"><button id="btnCSV" class="btn btn-outline-light btn-sm">Download CSV</button></div>
             </div>
           </div>
+          <div class="col-lg-3 meme-hide-sm">
+            <div class="meme meme-16x9 h-100">
+              <img loading="lazy" src="assets/memes/alloc_atm_bill.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/alloc_atm_bill.jpg';"
+                   alt="ATM eats bill">
+            </div>
+          </div>
+          <div class="col-lg-3 meme-hide-sm">
+            <div class="meme meme-16x9 h-100">
+              <img loading="lazy" src="assets/memes/alloc_porsche_kittens.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/alloc_porsche_kittens.jpg';"
+                   alt="Kittens on a Porsche">
+            </div>
+          </div>
+        </div>
 
+        <!-- Row 3: Compare card + two memes -->
+        <div class="row g-3 mt-1">
           <div class="col-lg-6">
             <div class="card p-3 h-100">
-              <!-- New main title -->
               <h3 class="h6 mb-3">Compare MegaEngage with holding your 'broken' coins!</h3>
 
-              <!-- Coin selection -->
               <div class="mb-3">
                 <label class="form-label d-none d-lg-block">Coin selection</label>
                 <select id="coinSelect" class="form-select d-none d-lg-block" style="max-width:260px">
-                  <option value="ATOM" selected>ATOM</option>
-                  <option value="XRP">XRP</option>
-                  <option value="ADA">ADA</option>
-                  <option value="DOT">DOT</option>
+                  <option value="ATOM" selected>ATOM</option><option value="XRP">XRP</option><option value="ADA">ADA</option><option value="DOT">DOT</option>
                 </select>
-                <!-- Mobile pills -->
                 <div id="coinButtons" class="d-flex gap-2 flex-wrap d-lg-none mt-1">
                   <button type="button" class="btn btn-outline-light btn-sm" data-coin="ATOM">ATOM</button>
                   <button type="button" class="btn btn-outline-light btn-sm" data-coin="XRP">XRP</button>
@@ -381,45 +302,21 @@ contract MegaCounter {
                 </div>
               </div>
 
-              <!-- Holding APY moved here -->
               <div class="mb-3" style="max-width:260px">
                 <label class="form-label">Holding APY (%)</label>
-                <input id="apy" type="number" class="form-control" value="20" min="0" max="100" step="0.1">
+                <input id="apy" type="number" class="form-control" value="20" step="0.1">
                 <div class="form-text muted">Compounded for 12m breakeven</div>
               </div>
 
-              <!-- Sub-title -->
               <h4 class="h6 mb-2">Breakeven vs Holding <span id="coinLabel">ATOM</span> (12 months)</h4>
-
               <div class="row g-2">
-                <div class="col-md-5">
-                  <div class="muted">Compounding</div>
-                  <select id="compound" class="form-select">
-                    <option value="12" selected>Monthly</option>
-                    <option value="4">Quarterly</option>
-                    <option value="1">Annual</option>
-                  </select>
-                </div>
-                <div class="col-md-7">
-                  <div class="muted"><span id="coinLabel2">ATOM</span> USD scenarios</div>
-                  <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-outline-light btn-sm" data-chg="-0.3">−30%</button>
-                    <button class="btn btn-outline-light btn-sm" data-chg="0">0%</button>
-                    <button class="btn btn-outline-light btn-sm" data-chg="0.5">+50%</button>
-                  </div>
-                </div>
+                <div class="col-md-5"><div class="muted">Compounding</div><select id="compound" class="form-select"><option value="12" selected>Monthly</option><option value="4">Quarterly</option><option value="1">Annual</option></select></div>
+                <div class="col-md-7"><div class="muted"><span id="coinLabel2">ATOM</span> USD scenarios</div><div class="d-flex gap-2 flex-wrap"><button class="btn btn-outline-light btn-sm" data-chg="-0.3">−30%</button><button class="btn btn-outline-light btn-sm" data-chg="0">0%</button><button class="btn btn-outline-light btn-sm" data-chg="0.5">+50%</button></div></div>
               </div>
 
               <div class="table-responsive mt-3">
                 <table class="table table-sm table-bordered align-middle text-nowrap">
-                  <thead>
-                    <tr>
-                      <th><span id="coinLabel3">ATOM</span> 12m change</th>
-                      <th>End value (holding)</th>
-                      <th>Breakeven TGE price</th>
-                      <th>Breakeven FDV</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th><span id="coinLabel3">ATOM</span> 12m change</th><th>End value (holding)</th><th>Breakeven TGE price</th><th>Breakeven FDV</th></tr></thead>
                   <tbody id="breakevenRows"></tbody>
                 </table>
               </div>
@@ -430,82 +327,109 @@ contract MegaCounter {
               </div>
             </div>
           </div>
+
+          <div class="col-lg-3 meme-hide-sm">
+            <div class="meme meme-4x3 h-100">
+              <img loading="lazy" src="assets/memes/compare_vr_kid_cash.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/compare_vr_kid_cash.jpg';"
+                   alt="Vision Pro + kid with cash">
+            </div>
+          </div>
+          <div class="col-lg-3 meme-hide-sm">
+            <div class="meme meme-4x3 h-100">
+              <img loading="lazy" src="assets/memes/compare_bing_bong.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/compare_bing_bong.jpg';"
+                   alt="Bing bong energy">
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- ===================== TWEET (5 variations) ===================== -->
-      <div class="tab-pane fade" id="pane-tweet" role="tabpanel" aria-labelledby="tab-tweet">
-        <div class="card p-3 mb-3">
-          <h2 class="h5 mb-2">Tweet Badge Generator</h2>
-          <p class="muted mb-3">Creates 5 variations with the required intro + your live calculator numbers.</p>
-
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label">Your repo URL (optional)</label>
-              <input id="repoUrl" class="form-control" placeholder="https://github.com/you/megaengage">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Live demo URL (optional)</label>
-              <input id="siteUrl" class="form-control" placeholder="https://mega.petranto.com/">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Your X handle (optional)</label>
-              <input id="xHandle" class="form-control" placeholder="@yourhandle">
-            </div>
-            <div class="col-12">
-              <label class="form-label">Recent MegaETH tx hashes (optional, newline-separated)</label>
-              <textarea id="txHashes" class="form-control mono" rows="2" placeholder="0xabc...\n0xdef..."></textarea>
-            </div>
-          </div>
-
-          <div class="d-flex gap-2 flex-wrap my-3">
-            <button id="btnBuildTweet" class="btn btn-primary">Build 5 posts</button>
-          </div>
-
-          <div id="tweetSet">
-            <!-- Post #1 -->
-            <div class="border rounded p-2 mb-3">
-              <div class="d-flex gap-2 flex-wrap mb-2">
-                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut1">Copy text</button>
-                <a class="btn btn-success btn-sm" id="tweetLink1" target="_blank" rel="noreferrer">Open tweet</a>
-              </div>
-              <textarea id="tweetOut1" class="form-control mono" rows="7" readonly></textarea>
-            </div>
-            <!-- Post #2 -->
-            <div class="border rounded p-2 mb-3">
-              <div class="d-flex gap-2 flex-wrap mb-2">
-                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut2">Copy text</button>
-                <a class="btn btn-success btn-sm" id="tweetLink2" target="_blank" rel="noreferrer">Open tweet</a>
-              </div>
-              <textarea id="tweetOut2" class="form-control mono" rows="7" readonly></textarea>
-            </div>
-            <!-- Post #3 -->
-            <div class="border rounded p-2 mb-3">
-              <div class="d-flex gap-2 flex-wrap mb-2">
-                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut3">Copy text</button>
-                <a class="btn btn-success btn-sm" id="tweetLink3" target="_blank" rel="noreferrer">Open tweet</a>
-              </div>
-              <textarea id="tweetOut3" class="form-control mono" rows="7" readonly></textarea>
-            </div>
-            <!-- Post #4 -->
-            <div class="border rounded p-2 mb-3">
-              <div class="d-flex gap-2 flex-wrap mb-2">
-                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut4">Copy text</button>
-                <a class="btn btn-success btn-sm" id="tweetLink4" target="_blank" rel="noreferrer">Open tweet</a>
-              </div>
-              <textarea id="tweetOut4" class="form-control mono" rows="7" readonly></textarea>
-            </div>
-            <!-- Post #5 -->
-            <div class="border rounded p-2 mb-1">
-              <div class="d-flex gap-2 flex-wrap mb-2">
-                <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut5">Copy text</button>
-                <a class="btn btn-success btn-sm" id="tweetLink5" target="_blank" rel="noreferrer">Open tweet</a>
-              </div>
-              <textarea id="tweetOut5" class="form-control mono" rows="7" readonly></textarea>
+        <!-- Row 4: extra meme beside Bad Bunnz vibe -->
+        <div class="row g-3 mt-1">
+          <div class="col-lg-6 meme-hide-sm">
+            <div class="meme meme-16x9">
+              <img loading="lazy" src="assets/memes/compare_bjj_escape.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/compare_bjj_escape.jpg';"
+                   alt="Jiu-jitsu escape tip">
             </div>
           </div>
         </div>
       </div>
+
+      <!-- ================= TWEETS ================= -->
+      <div class="tab-pane fade" id="pane-tweet">
+        <div class="row g-3">
+          <div class="col-12 col-xl-7">
+            <div class="card p-3 mb-3">
+              <h2 class="h5 mb-2">Tweet Badge Generator</h2>
+              <p class="muted mb-3">Creates 5 variations with the required intro + your live calculator numbers.</p>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label">Your repo URL (optional)</label><input id="repoUrl" class="form-control" placeholder="https://github.com/you/megaengage"></div>
+                <div class="col-md-6"><label class="form-label">Your X handle (optional)</label><input id="xHandle" class="form-control" placeholder="@yourhandle"></div>
+                <div class="col-md-12"><label class="form-label">Live demo URL (optional)</label><input id="siteUrl" class="form-control" placeholder="https://mega.petranto.com/"></div>
+                <div class="col-12"><label class="form-label">Recent MegaETH tx hashes (optional, newline-separated)</label><textarea id="txHashes" class="form-control mono" rows="2" placeholder="0xabc...\n0xdef..."></textarea></div>
+              </div>
+              <div class="d-flex gap-2 flex-wrap my-3"><button id="btnBuildTweet" class="btn btn-primary">Build 5 posts</button></div>
+
+              <!-- Tweet #1 -->
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut1">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink1" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut1" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+
+              <!-- Meme strip between tweets -->
+              <div class="meme meme-16x9 mb-3 meme-hide-sm">
+                <img loading="lazy" src="assets/memes/tweets_please_dont_poop.webp"
+                     onerror="this.onerror=null;this.src='assets/memes/tweets_please_dont_poop.jpg';"
+                     alt="Please don't poop sign">
+              </div>
+
+              <!-- Tweet #2..#5 -->
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut2">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink2" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut2" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut3">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink3" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut3" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut4">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink4" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut4" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+              <div class="border rounded p-2">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut5">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink5" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut5" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: big photographers meme -->
+          <div class="col-12 col-xl-5">
+            <div class="meme meme-tall h-100">
+              <img loading="lazy" src="assets/memes/tweets_photogs_swimsuit.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/tweets_photogs_swimsuit.jpg';"
+                   alt="Photographers swarm meme">
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <footer class="pt-3" style="color:#fff">
@@ -543,7 +467,6 @@ waitForEthers().then(() => {
   };
   const fmtUSD = n => isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2}) : '—';
   const fmtPrice = n => isFinite(n) ? n.toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:6}) : '—';
-  const clamp = (x, lo, hi) => Math.min(Math.max(x, lo), hi);
   const explorerTx = (hash) => `https://megaexplorer.xyz/tx/${hash}`;
 
   // ---------- Chain params ----------
@@ -667,92 +590,74 @@ waitForEthers().then(() => {
     } catch (e) { $('ctrStatus').textContent = 'Error: ' + (e?.message||e); }
   };
 
-  // ---------- “Broken Coins” presets ----------
+  // ---------- Presets & selectors ----------
   const COIN_PRESETS = { ATOM:{apy:0.20}, XRP:{apy:0.00}, ADA:{apy:0.045}, DOT:{apy:0.12} };
   function setCoinUI(sym){
-    ['coinLabel','coinLabel2','coinLabel3'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=sym; });
-    const preset = COIN_PRESETS[sym];
-    if (preset && document.getElementById('apy')) document.getElementById('apy').value=(preset.apy*100).toFixed(2);
+    ['coinLabel','coinLabel2','coinLabel3'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=sym;});
+    const preset = COIN_PRESETS[sym]; if (preset && document.getElementById('apy')) document.getElementById('apy').value=(preset.apy*100).toFixed(2);
   }
-
-  // --- Unified coin apply helper (desktop select + mobile pills) ---
   function applyCoin(sym){
-    setCoinUI(sym); // sets labels + APY
-    const sel = document.getElementById('coinSelect');
-    if (sel) sel.value = sym;
-    const btns = document.querySelectorAll('#coinButtons [data-coin]');
-    btns.forEach(b=>{
-      const active = b.dataset.coin === sym;
-      b.classList.toggle('btn-primary', active);
-      b.classList.toggle('btn-outline-light', !active);
+    setCoinUI(sym);
+    const sel=document.getElementById('coinSelect'); if(sel) sel.value=sym;
+    document.querySelectorAll('#coinButtons [data-coin]').forEach(b=>{
+      const active=b.dataset.coin===sym; b.classList.toggle('btn-primary',active); b.classList.toggle('btn-outline-light',!active);
     });
     recalc();
   }
-  // Desktop select
-  document.getElementById('coinSelect')?.addEventListener('change', (e)=>applyCoin(e.target.value));
-  // Mobile pill buttons
-  document.getElementById('coinButtons')?.addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-coin]');
-    if (!btn) return;
-    applyCoin(btn.dataset.coin);
-  });
-  // Initial selection
+  document.getElementById('coinSelect')?.addEventListener('change', e=>applyCoin(e.target.value));
+  document.getElementById('coinButtons')?.addEventListener('click', e=>{const t=e.target.closest('[data-coin]'); if(t) applyCoin(t.dataset.coin);});
   applyCoin(document.getElementById('coinSelect')?.value || 'ATOM');
 
   // ---------- Calculator ----------
-  const inputs = ['bid','price','discount','bonus','supply','fdvPreset','fdvCustom','apy','compound'];
-  inputs.forEach(id => document.getElementById(id)?.addEventListener('input', recalc));
-  document.getElementById('toggleLock')?.addEventListener('click', () => {
-    const d = parseFloat(document.getElementById('discount').value||0);
-    document.getElementById('discount').value = (d>0?0:10).toString(); recalc();
-  });
-  document.getElementById('fdvPreset')?.addEventListener('change', () => {
-    const v = document.getElementById('fdvPreset').value;
-    if (v !== 'custom') document.getElementById('fdvCustom').value = v; recalc();
-  });
-  document.querySelectorAll('[data-chg]').forEach(btn => btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-chg]').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-  }));
-  document.getElementById('useBonusForBreakeven')?.addEventListener('change', recalc);
+  const inputs=['bid','price','discount','bonus','supply','fdvPreset','fdvCustom','apy','compound'];
+  inputs.forEach(id=>document.getElementById(id)?.addEventListener('input',recalc));
+  document.getElementById('toggleLock')?.addEventListener('click',()=>{const d=parseFloat(document.getElementById('discount').value||0);document.getElementById('discount').value=(d>0?0:10).toString();recalc();});
+  document.getElementById('fdvPreset')?.addEventListener('change',()=>{const v=document.getElementById('fdvPreset').value;if(v!=='custom')document.getElementById('fdvCustom').value=v;recalc();});
+  document.querySelectorAll('[data-chg]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-chg]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}));
+
+  document.getElementById('useBonusForBreakeven')?.addEventListener('change',recalc);
 
   function vals(){
-    const $=id=>document.getElementById(id);
-    const bid=+($('bid')?.value||0), price=+($('price')?.value||0);
-    const discount=Math.min(Math.max(+($('discount')?.value||0),0),50)/100;
-    const bonus=Math.min(Math.max(+($('bonus')?.value||0),0),100)/100;
-    const supply=+($('supply')?.value||0), fdv=+($('fdvCustom')?.value||0);
-    const apy=+($('apy')?.value||0)/100, compound=parseInt($('compound')?.value||12,10);
+    const bid=+document.getElementById('bid')?.value||0;
+    const price=+document.getElementById('price')?.value||0;
+    const discount=Math.min(Math.max(+document.getElementById('discount')?.value||0,0),50)/100;
+    const bonus=Math.min(Math.max(+document.getElementById('bonus')?.value||0,0),100)/100;
+    const supply=+document.getElementById('supply')?.value||0;
+    const fdv=+document.getElementById('fdvCustom')?.value||0;
+    const apy=+document.getElementById('apy')?.value||0/100;
+    const compound=parseInt(document.getElementById('compound')?.value||12,10);
     return {bid,price,discount,bonus,supply,fdv,apy,compound};
   }
 
   function recalc(){
-    const v = vals();
-    if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) {
-      ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
+    const v=vals();
+    if(!(v.bid>0&&v.price>0&&v.supply>0&&v.fdv>0)){
+      ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
       const br=document.getElementById('breakevenRows'); if(br) br.innerHTML='';
-      if (window.buildTweetSet) window.buildTweetSet();
+      if(window.buildTweetSet) window.buildTweetSet();
       return;
     }
-    const effPrice=v.price*(1-v.discount), tokensBase=v.bid/effPrice, tokensBonus=tokensBase*(1+v.bonus);
-    const tgePrice=v.fdv/v.supply, valBase=tokensBase*tgePrice, valBonus=tokensBonus*tgePrice;
+    const effPrice=v.price*(1-v.discount);
+    const tokensBase=v.bid/effPrice, tokensBonus=tokensBase*(1+v.bonus);
+    const tgePrice=v.fdv/v.supply;
+    const valBase=tokensBase*tgePrice, valBonus=tokensBonus*tgePrice;
     const roiBase=(valBase-v.bid)/v.bid*100, roiBonus=(valBonus-v.bid)/v.bid*100;
 
-    document.getElementById('effPrice').textContent = '$' + effPrice.toLocaleString(undefined,{minimumFractionDigits:4,maximumFractionDigits:6});
-    document.getElementById('tokensBase').textContent = tokensBase.toLocaleString(undefined,{maximumFractionDigits:2});
-    document.getElementById('tokensBonus').textContent = tokensBonus.toLocaleString(undefined,{maximumFractionDigits:2});
-    document.getElementById('tgePrice').textContent = '$' + tgePrice.toLocaleString(undefined,{minimumFractionDigits:4,maximumFractionDigits:6});
-    document.getElementById('valBase').textContent = fmtUSD(valBase);
-    document.getElementById('valBonus').textContent = fmtUSD(valBonus);
-    document.getElementById('roiBase').textContent = (roiBase>=0?'+':'') + roiBase.toLocaleString(undefined,{maximumFractionDigits:2}) + '%';
-    document.getElementById('roiBonus').textContent = (roiBonus>=0?'+':'') + roiBonus.toLocaleString(undefined,{maximumFractionDigits:2}) + '%';
+    document.getElementById('effPrice').textContent='$'+effPrice.toLocaleString(undefined,{minimumFractionDigits:4,maximumFractionDigits:6});
+    document.getElementById('tokensBase').textContent=tokensBase.toLocaleString(undefined,{maximumFractionDigits:2});
+    document.getElementById('tokensBonus').textContent=tokensBonus.toLocaleString(undefined,{maximumFractionDigits:2});
+    document.getElementById('tgePrice').textContent='$'+tgePrice.toLocaleString(undefined,{minimumFractionDigits:4,maximumFractionDigits:6});
+    document.getElementById('valBase').textContent=fmtUSD(valBase);
+    document.getElementById('valBonus').textContent=fmtUSD(valBonus);
+    document.getElementById('roiBase').textContent=(roiBase>=0?'+':'')+roiBase.toLocaleString(undefined,{maximumFractionDigits:2})+'%';
+    document.getElementById('roiBonus').textContent=(roiBonus>=0?'+':'')+roiBonus.toLocaleString(undefined,{maximumFractionDigits:2})+'%';
 
-    // Breakeven table
-    const comp = parseInt(document.getElementById('compound')?.value||'12',10);
-    const factor = Math.pow(1 + (v.apy/comp), comp);
-    const useBonus = document.getElementById('useBonusForBreakeven')?.checked;
-    const tokensForBreakeven = useBonus ? tokensBonus : tokensBase;
-    const scenarios = [-0.30, 0, 0.50];
-    document.getElementById('breakevenRows').innerHTML = scenarios.map(chg=>{
+    // breakeven
+    const comp=parseInt(document.getElementById('compound')?.value||'12',10);
+    const factor=Math.pow(1+(v.apy/comp),comp);
+    const useBonus=document.getElementById('useBonusForBreakeven')?.checked;
+    const tokensForBreakeven=useBonus?tokensBonus:tokensBase;
+    const rows=[-0.30,0,0.50].map(chg=>{
       const endValue=v.bid*factor*(1+chg);
       const neededPrice=endValue/(tokensForBreakeven||1);
       const neededFDV=neededPrice*v.supply;
@@ -763,54 +668,26 @@ waitForEthers().then(() => {
         <td class="mono">$${neededFDV.toLocaleString()}</td>
       </tr>`;
     }).join('');
+    document.getElementById('breakevenRows').innerHTML=rows;
 
-    if (window.buildTweetSet) window.buildTweetSet();
+    if(window.buildTweetSet) window.buildTweetSet();
   }
 
   // CSV
-  document.getElementById('btnCSV')?.addEventListener('click', () => {
-    const v = vals();
-    if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) { alertBox('Fill bid, price, supply, FDV first.', 'warning'); return; }
-    const effPrice=v.price*(1-v.discount);
-    const tokensBase=v.bid/effPrice, tokensBonus=tokensBase*(1+v.bonus);
-    const tgePrice=v.fdv/v.supply;
-    const valBase=tokensBase*tgePrice, valBonus=tokensBonus*tgePrice;
-    const roiBase=(valBase-v.bid)/v.bid*100, roiBonus=(valBonus-v.bid)/v.bid*100;
+  document.getElementById('btnCSV')?.addEventListener('click',()=>{
+    const v=vals();
+    if(!(v.bid>0&&v.price>0&&v.supply>0&&v.fdv>0)){alertBox('Fill bid, price, supply, FDV first.','warning');return;}
+    const eff=v.price*(1-v.discount);
+    const tb=v.bid/eff, tbo=tb*(1+v.bonus), tge=v.fdv/v.supply;
+    const vb=tb*tge, vbo=tbo*tge, rb=(vb-v.bid)/v.bid*100, rbo=(vbo-v.bid)/v.bid*100;
     const factorMonthly=Math.pow(1+(v.apy/12),12), endFlat=v.bid*factorMonthly;
-    const coinSym=(document.getElementById('coinLabel')?.textContent||'COIN');
-
-    const rows=[
-      ['Parameter','Value'],
-      ['Bid (USDT)', v.bid], ['Clearing price P', v.price],
-      ['Lock discount %', (v.discount*100).toFixed(2)], ['Bonus %', (v.bonus*100).toFixed(2)],
-      ['Supply', v.supply], ['TGE FDV', v.fdv], ['TGE price', tgePrice], [],
-      ['Metric','No bonus','With bonus'],
-      ['Effective paid price', effPrice, effPrice],
-      ['Tokens', tokensBase, tokensBonus],
-      ['Value @ TGE', valBase, valBonus],
-      ['ROI %', roiBase, roiBonus], [],
-      [`${coinSym} Holding APY % (12m, monthly comp.)`, (v.apy*100).toFixed(2)],
-      [`End value if ${coinSym}/USD flat`, endFlat], [],
-      [`${coinSym} Δ`,'End value (holding)','Breakeven TGE px','Breakeven FDV']
-    ];
-    [-0.30,0,0.50].forEach(chg=>{
-      const endValue=v.bid*Math.pow(1+(v.apy/12),12)*(1+chg);
-      const priceReq=endValue/((v.bonus>0?tokensBonus:tokensBase)||1);
-      rows.push([ (chg*100)+'%', endValue, priceReq, priceReq*v.supply ]);
-    });
-
-    const csv = rows.map(r => (r||[]).map(c => {
-      const s=(c===undefined||c===null)?'':String(c);
-      return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;
-    }).join(',')).join('\n');
-
-    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url;
-    a.download=`mega_calculator_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    const sym=(document.getElementById('coinLabel')?.textContent||'COIN');
+    const rows=[['Parameter','Value'],['Bid (USDT)',v.bid],['Clearing price P',v.price],['Lock discount %',(v.discount*100).toFixed(2)],['Bonus %',(v.bonus*100).toFixed(2)],['Supply',v.supply],['TGE FDV',v.fdv],['TGE price',tge],[],['Metric','No bonus','With bonus'],['Effective paid price',eff,eff],['Tokens',tb,tbo],['Value @ TGE',vb,vbo],['ROI %',rb,rbo],[],[`${sym} Holding APY % (12m, monthly comp.)`,(v.apy*100).toFixed(2)],[`End value if ${sym}/USD flat`,endFlat],[],[`${sym} Δ`,'End value (holding)','Breakeven TGE px','Breakeven FDV']];
+    [-0.30,0,0.50].forEach(chg=>{const end=v.bid*Math.pow(1+(v.apy/12),12)*(1+chg);const priceReq=end/((v.bonus>0?tbo:tb)||1);rows.push([(chg*100)+'%',end,priceReq,priceReq*v.supply]);});
+    const csv=rows.map(r=>(r||[]).map(c=>{const s=(c==null)?'':String(c);return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`mega_calculator_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   });
 
-  // React to account/network changes
   if (window.ethereum) {
     window.ethereum.on('accountsChanged', () => location.reload());
     window.ethereum.on('chainChanged', () => location.reload());
@@ -818,73 +695,65 @@ waitForEthers().then(() => {
 })();
 }).catch(err=>{
   const alerts=document.getElementById('alerts');
-  if(alerts){alerts.innerHTML=`<div class="alert alert-danger">Failed to load ethers: ${err.message}. Check the UMD script and redeploy.</div>`;}
+  if(alerts){alerts.innerHTML=`<div class="alert alert-danger">Failed to load ethers: ${err.message}.</div>`;}
 });
 </script>
 
-<!-- ===== Tweet builder (5 variations, exact format) ===== -->
+<!-- ===== Tweet builder (5 variants) ===== -->
 <script>
-  const thinSpace = '\u202F';
-  const withThinSpaces = (s) => s.replace(/,/g, thinSpace);
-  const fmtThin = (n, opts) => withThinSpaces(Number(n).toLocaleString('en-US', opts));
-  const fmtMoneyNoCentsThin = (n) => '$' + fmtThin(n, { maximumFractionDigits: 0 });
-  const fmtMoneyThin = (n, min=0, max=2) => '$' + fmtThin(n, { minimumFractionDigits:min, maximumFractionDigits:max });
-  const fmtNumThin = (n, min=0, max=0) => fmtThin(n, { minimumFractionDigits:min, maximumFractionDigits:max });
+  const thinSpace='\u202F';
+  const withThin=s=>s.replace(/,/g,thinSpace);
+  const fmtMoney=(n,min=0,max=2)=>'$'+withThin(Number(n).toLocaleString('en-US',{minimumFractionDigits:min,maximumFractionDigits:max}));
+  const fmtNoCents=n=>'$'+withThin(Number(n).toLocaleString('en-US',{maximumFractionDigits:0}));
+  const fmtInt=n=>withThin(Number(n).toLocaleString('en-US',{maximumFractionDigits:0}));
 
   function currentCalc(){
-    const bid = +(document.getElementById('bid')?.value || 0);
-    const price = +(document.getElementById('price')?.value || 0);
-    const discount = Math.min(Math.max(+(document.getElementById('discount')?.value || 0),0),50) / 100;
-    const supply = +(document.getElementById('supply')?.value || 0);
-    const fdv = +(document.getElementById('fdvCustom')?.value || 0);
-    const eff = price * (1 - discount);
-    const tokens = (eff>0) ? (bid/eff) : 0;
-    const tgePx = (supply>0) ? (fdv/supply) : 0;
-    const roiPct = (bid>0) ? (((tokens*tgePx) - bid)/bid*100) : 0;
-    return { bid, discountPct: discount*100, eff, tokens, fdv, tgePx, roiPct };
+    const bid=+document.getElementById('bid')?.value||0;
+    const price=+document.getElementById('price')?.value||0;
+    const discount=Math.min(Math.max(+document.getElementById('discount')?.value||0,0),50)/100;
+    const supply=+document.getElementById('supply')?.value||0;
+    const fdv=+document.getElementById('fdvCustom')?.value||0;
+    const eff=price*(1-discount);
+    const tokens=eff>0?bid/eff:0;
+    const tgePx=supply>0?fdv/supply:0;
+    const roiPct=bid>0?((tokens*tgePx)-bid)/bid*100:0;
+    return {bid,discountPct:discount*100,eff,tokens,fdv,tgePx,roiPct};
   }
 
-  const INTRO_BODIES = [
+  const INTRO=[
     "I have farmed @megaeth_labs testnet, calculated my dream allocation and even convinced myself to dump my dead bags to buy some $MEGA!",
     "Grinding @megaeth_labs testnet, ran the calculator, and rotating out of the fossils into $MEGA.",
     "After weeks on @megaeth_labs testnet and a few calculator runs, I’m reallocating the bag — hello $MEGA.",
     "Built my flow on @megaeth_labs, crunched the numbers, and the conviction is set: going heavier on $MEGA.",
     "Farming @megaeth_labs testnet + the airdrop tool = I’m ditching the dead weight for $MEGA."
   ];
-
-  function shuffle(arr){
-    const a = arr.slice();
-    for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}
-    return a;
-  }
-
-  function buildPost(bodyLine2, vals){
-    const L1 = "🤖 Mega Engage!";
-    const L2 = bodyLine2;
-    const L3 = `Bid: ${fmtMoneyNoCentsThin(vals.bid)} • Lock: ${fmtNumThin(vals.discountPct,0,0)}% • Eff: ${fmtMoneyThin(vals.eff,5,5)}`;
-    const L4 = `Tokens≈ ${fmtNumThin(Math.round(vals.tokens))} • TGE FDV ${fmtMoneyNoCentsThin(vals.fdv)} • TGE px≈ ${fmtMoneyThin(vals.tgePx,3,3)}`;
-    const sign = vals.roiPct>=0?'+':'';
-    const L5 = `Est. TGE ROI≈ ${sign}${fmtNumThin(Math.abs(vals.roiPct),1,1)}%`;
-    const L6 = `#MegaETH #L2 #web3 #MegaEngage`;
+  function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+  function buildPost(intro,v){
+    const L1="🤖 Mega Engage!";
+    const L2=intro;
+    const L3=`Bid: ${fmtNoCents(v.bid)} • Lock: ${Math.round(v.discountPct)}% • Eff: ${fmtMoney(v.eff,5,5)}`;
+    const L4=`Tokens≈ ${fmtInt(Math.round(v.tokens))} • TGE FDV ${fmtNoCents(v.fdv)} • TGE px≈ ${fmtMoney(v.tgePx,3,3)}`;
+    const s=v.roiPct>=0?'+':'-';
+    const L5=`Est. TGE ROI≈ ${s}${withThin(Math.abs(v.roiPct).toFixed(1))}%`;
+    const L6="#MegaETH #L2 #web3 #MegaEngage";
     return [L1,L2,L3,L4,L5,L6].join('\n');
   }
-
   function buildTweetSet(){
-    const vals = currentCalc();
-    const intros = shuffle(INTRO_BODIES).slice(0,5);
-    const posts = intros.map(intro => buildPost(intro, vals));
-
-    posts.forEach((text, i) => {
-      const idx = i+1;
-      const out = document.getElementById('tweetOut'+idx);
-      const a  = document.getElementById('tweetLink'+idx);
-      if (out) out.value = text;
-      if (a)   a.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
-    });
+    const v=currentCalc();
+    const posts=shuffle(INTRO).slice(0,5).map(t=>buildPost(t,v));
+    for(let i=1;i<=5;i++){
+      const out=document.getElementById('tweetOut'+i), link=document.getElementById('tweetLink'+i);
+      if(out) out.value=posts[i-1];
+      if(link) link.href='https://twitter.com/intent/tweet?text='+encodeURIComponent(posts[i-1]);
+    }
   }
-
-  window.buildTweetSet = buildTweetSet;
-  document.getElementById('btnBuildTweet')?.addEventListener('click', buildTweetSet);
+  window.buildTweetSet=buildTweetSet;
+  document.getElementById('btnBuildTweet')?.addEventListener('click',buildTweetSet);
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-copy]'); if(!b) return;
+    const sel=b.getAttribute('data-copy'); const ta=document.querySelector(sel);
+    if(ta){navigator.clipboard.writeText(ta.value).then(()=>{b.textContent='Copied!';setTimeout(()=>b.textContent='Copy text',1200);});}
+  });
   buildTweetSet();
 </script>
 
