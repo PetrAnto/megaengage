@@ -27,7 +27,7 @@
     .banner-wrap{border-bottom:1px solid #c6c6c6}
     .banner-logo{max-height:88px}
     @media (min-width:576px){.banner-logo{max-height:120px}}
-    @media (min-width:992px){.banner-logo{max-height:288px}} /* ~4x desktop */
+    @media (min-width:992px){.banner-logo{max-height:288px}} /* bigger on desktop */
 
     .mid-hero{background:var(--card);border-bottom:1px solid var(--border)}
     .mid-hero .page-header{color:#fff}
@@ -54,7 +54,6 @@
     .table thead th{color:var(--thead)!important;background:var(--thead-bg)!important;border-bottom-color:#3a414b!important;font-weight:600}
     .table td,.table th{border-color:#3a414b!important}
 
-    /* Memes */
     .meme{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 6px 18px rgba(0,0,0,.12);background:#000}
     .meme img{width:100%;height:100%;object-fit:cover;display:block}
     .meme-16x9{aspect-ratio:16/9}
@@ -63,25 +62,15 @@
     .meme-tall{aspect-ratio:3/4}
     .stack > * + *{margin-top:1rem}
 
-    /* Equal-height for Engage left column */
+    /* Equal-height helpers */
     #engage-left .engage-half{height:auto}
-    @media (min-width: 992px){
-      #engage-left{gap:1rem}
-    }
+    @media (min-width: 992px){ #engage-left{gap:1rem} }
 
-    /* NEW: width + height caps for “too wide” images (desktop) */
+    /* small width cap utilities (desktop only) */
     .shrink-85{max-width:85%; margin-left:auto; margin-right:auto;}
-    .capped-360{aspect-ratio:auto; height:360px;}
-    .capped-240{aspect-ratio:auto; height:240px;}
-    .capped-360 img,.capped-240 img{height:100%;}
+    @media (max-width: 991.98px){ .shrink-85{max-width:100%;} }
 
-    /* On mobile, let them expand naturally */
-    @media (max-width: 991.98px){
-      .shrink-85{max-width:100%;}
-      .capped-360,.capped-240{height:auto; aspect-ratio:16/9;}
-    }
-
-    /* Tweet right image 33% smaller */
+    /* Tweet right image 33% smaller on wide screens */
     @media (min-width:1200px){ .tweet-aside{max-width:66%; margin-left:auto;} }
 
     .card pre{max-height:320px; overflow:auto}
@@ -208,20 +197,20 @@ contract MegaCounter {
         </div>
 
         <!-- 4) Bad Bunnz row -->
-        <div class="row g-3 mt-1">
+        <div class="row g-3 mt-1 align-items-stretch" id="row-bunnz">
           <div class="col-12 col-lg-6">
             <div class="card p-3 mb-3">
               <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
               <p class="muted mb-3">Bad Bunnz is <em>probably</em> the leading web3 project on MegaETH right now.</p>
               <a class="btn btn-success" href="https://opensea.io/collection/bad-bunnz" target="_blank" rel="noreferrer">Browse on OpenSea</a>
             </div>
-            <div class="meme meme-4x3">
+            <div class="meme meme-4x3" id="bunnzMeme">
               <img loading="lazy" src="assets/memes/engage_badbunnz.webp" onerror="this.onerror=null;this.src='assets/memes/engage_badbunnz.jpg';" alt="">
             </div>
           </div>
           <div class="col-12 col-lg-6">
-            <!-- ↓↓ smaller & capped height -->
-            <div class="meme meme-16x9 shrink-60 capped-360">
+            <!-- same size as left bunny image -->
+            <div class="meme meme-4x3 shrink-85" id="bjjMeme">
               <img loading="lazy" src="assets/memes/compare_bjj_escape.webp" onerror="this.onerror=null;this.src='assets/memes/compare_bjj_escape.jpg';" alt="">
             </div>
           </div>
@@ -237,7 +226,7 @@ contract MegaCounter {
             </div>
           </div>
           <div class="col-12 col-lg-6">
-            <div class="card p-3 h-100">
+            <div class="card p-3 h-100" id="allocCard">
               <h2 class="h5 mb-3">MEGA Airdrop / Allocation Calculator</h2>
               <div class="row g-3">
                 <div class="col-md-6"><label class="form-label">Bid amount (USDT)</label><input id="bid" type="number" class="form-control" value="2700"></div>
@@ -252,8 +241,8 @@ contract MegaCounter {
           </div>
         </div>
 
-        <!-- Allocation + small memes -->
-        <div class="row g-3 mt-1">
+        <!-- Allocation + images (match heights) -->
+        <div class="row g-3 mt-1 align-items-stretch">
           <div class="col-lg-6">
             <div class="card p-3 h-100">
               <h3 class="h6 mb-3">Allocation & ROI (at TGE)</h3>
@@ -271,24 +260,20 @@ contract MegaCounter {
               <div class="mt-3"><button id="btnCSV" class="btn btn-outline-light btn-sm">Download CSV</button></div>
             </div>
           </div>
-          <div class="col-lg-3">
-            <!-- ↓↓ smaller -->
-            <div class="meme meme-16x9 shrink-85 capped-240">
+          <div class="col-lg-6" id="allocImgs">
+            <div class="meme meme-16x9 mb-3 alloc-img">
               <img loading="lazy" src="assets/memes/alloc_atm_bill.webp" onerror="this.onerror=null;this.src='assets/memes/alloc_atm_bill.jpg';" alt="">
             </div>
-          </div>
-          <div class="col-lg-3">
-            <!-- ↓↓ smaller -->
-            <div class="meme meme-16x9 shrink-85 capped-240">
+            <div class="meme meme-16x9 alloc-img">
               <img loading="lazy" src="assets/memes/alloc_porsche_kittens.webp" onerror="this.onerror=null;this.src='assets/memes/alloc_porsche_kittens.jpg';" alt="">
             </div>
           </div>
         </div>
 
-        <!-- Compare + small memes -->
-        <div class="row g-3 mt-1">
+        <!-- Compare + images (match heights) -->
+        <div class="row g-3 mt-1 align-items-stretch">
           <div class="col-lg-6">
-            <div class="card p-3 h-100">
+            <div class="card p-3 h-100" id="compareCard">
               <h3 class="h6 mb-3">Compare MegaEngage with holding your 'broken' coins!</h3>
               <div class="mb-3">
                 <label class="form-label d-none d-lg-block">Coin selection</label>
@@ -325,13 +310,11 @@ contract MegaCounter {
             </div>
           </div>
 
-          <div class="col-lg-3">
-            <div class="meme meme-4x3 shrink-85 capped-240">
+          <div class="col-lg-6" id="compareImgs">
+            <div class="meme meme-4x3 mb-3 compare-img">
               <img loading="lazy" src="assets/memes/compare_vr_kid_cash.webp" onerror="this.onerror=null;this.src='assets/memes/compare_vr_kid_cash.jpg';" alt="">
             </div>
-          </div>
-          <div class="col-lg-3">
-            <div class="meme meme-4x3 shrink-85 capped-240">
+            <div class="meme meme-4x3 compare-img">
               <img loading="lazy" src="assets/memes/compare_bing_bong.webp" onerror="this.onerror=null;this.src='assets/memes/compare_bing_bong.jpg';" alt="">
             </div>
           </div>
@@ -342,7 +325,6 @@ contract MegaCounter {
       <div class="tab-pane fade" id="pane-tweet">
         <div class="row g-3">
           <div class="col-12 col-xl-7">
-            <!-- Tweet builder card (unchanged) -->
             <div class="card p-3 mb-3">
               <h2 class="h5 mb-2">Tweet Badge Generator</h2>
               <p class="muted mb-3">Creates 5 variations with the required intro + your live calculator numbers.</p>
@@ -352,14 +334,53 @@ contract MegaCounter {
                 <div class="col-md-12"><label class="form-label">Live demo URL (optional)</label><input id="siteUrl" class="form-control" placeholder="https://mega.petranto.com/"></div>
                 <div class="col-12"><label class="form-label">Recent MegaETH tx hashes (optional, newline-separated)</label><textarea id="txHashes" class="form-control mono" rows="2" placeholder="0xabc...\n0xdef..."></textarea></div>
               </div>
-              <div class="d-flex gap-2 flex-wrap my-3"><button id="btnBuildTweet" class="btn btn-primary">Build 5 posts</button></div>
-              <!-- Five tweet slots (unchanged)… -->
-              <div class="border rounded p-2 mb-3"><div class="d-flex gap-2 flex-wrap mb-2"><button class="btn btn-outline-light btn-sm" data-copy="#tweetOut1">Copy text</button><a class="btn btn-success btn-sm" id="tweetLink1" target="_blank" rel="noreferrer">Open tweet</a></div><textarea id="tweetOut1" class="form-control mono" rows="7" readonly></textarea></div>
-              <div class="meme meme-16x9 mb-3"><img loading="lazy" src="assets/memes/tweets_please_dont_poop.webp" onerror="this.onerror=null;this.src='assets/memes/tweets_please_dont_poop.jpg';" alt=""></div>
-              <div class="border rounded p-2 mb-3"><div class="d-flex gap-2 flex-wrap mb-2"><button class="btn btn-outline-light btn-sm" data-copy="#tweetOut2">Copy text</button><a class="btn btn-success btn-sm" id="tweetLink2" target="_blank" rel="noreferrer">Open tweet</a></div><textarea id="tweetOut2" class="form-control mono" rows="7" readonly></textarea></div>
-              <div class="border rounded p-2 mb-3"><div class="d-flex gap-2 flex-wrap mb-2"><button class="btn btn-outline-light btn-sm" data-copy="#tweetOut3">Copy text</button><a class="btn btn-success btn-sm" id="tweetLink3" target="_blank" rel="noreferrer">Open tweet</a></div><textarea id="tweetOut3" class="form-control mono" rows="7" readonly></textarea></div>
-              <div class="border rounded p-2 mb-3"><div class="d-flex gap-2 flex-wrap mb-2"><button class="btn btn-outline-light btn-sm" data-copy="#tweetOut4">Copy text</button><a class="btn btn-success btn-sm" id="tweetLink4" target="_blank" rel="noreferrer">Open tweet</a></div><textarea id="tweetOut4" class="form-control mono" rows="7" readonly></textarea></div>
-              <div class="border rounded p-2"><div class="d-flex gap-2 flex-wrap mb-2"><button class="btn btn-outline-light btn-sm" data-copy="#tweetOut5">Copy text</button><a class="btn btn-success btn-sm" id="tweetLink5" target="_blank" rel="noreferrer">Open tweet</a></div><textarea id="tweetOut5" class="form-control mono" rows="7" readonly></textarea></div>
+              <div class="d-flex gap-2 flex-wrap my-3">
+                <button id="btnBuildTweet" class="btn btn-primary">Build 5 posts</button>
+              </div>
+              <!-- 5 tweet outputs -->
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut1">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink1" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut1" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+
+              <div class="meme meme-16x9 mb-3">
+                <img loading="lazy" src="assets/memes/tweets_please_dont_poop.webp" onerror="this.onerror=null;this.src='assets/memes/tweets_please_dont_poop.jpg';" alt="">
+              </div>
+
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut2">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink2" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut2" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut3">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink3" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut3" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+
+              <div class="border rounded p-2 mb-3">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut4">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink4" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut4" class="form-control mono" rows="7" readonly></textarea>
+              </div>
+
+              <div class="border rounded p-2">
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button class="btn btn-outline-light btn-sm" data-copy="#tweetOut5">Copy text</button>
+                  <a class="btn btn-success btn-sm" id="tweetLink5" target="_blank" rel="noreferrer">Open tweet</a>
+                </div>
+                <textarea id="tweetOut5" class="form-control mono" rows="7" readonly></textarea>
+              </div>
             </div>
           </div>
 
@@ -383,25 +404,413 @@ contract MegaCounter {
 </div>
 
 <script>
-/* equalize engage left images to height of cards 1–3 */
-function syncEngageHeights(){
-  const left=document.getElementById('engage-left');
-  const cards=document.getElementById('engage-cards123');
-  if(!left||!cards) return;
-  if(window.innerWidth<992){ left.querySelectorAll('.engage-half').forEach(el=>el.style.height=''); return; }
-  const h=cards.getBoundingClientRect().height||0;
-  const gap=parseFloat(getComputedStyle(left).gap||'16');
-  const half=Math.max(100,(h-gap)/2);
-  left.querySelectorAll('.engage-half').forEach(el=>el.style.height=half+'px');
-}
-let __r; window.addEventListener('load',syncEngageHeights);
-window.addEventListener('resize',()=>{clearTimeout(__r); __r=setTimeout(syncEngageHeights,120);});
-</script>
+(() => {
+  // ---------- Helpers ----------
+  const $ = id => document.getElementById(id);
+  const alertBox = (msg, type='info') => {
+    const el = $('alerts');
+    el.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+  };
+  const fmtUSD = n => isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2}) : '—';
+  const fmtNum = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : '—';
+  const fmtPrice = n => isFinite(n) ? n.toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:6}) : '—';
+  const clamp = (x, lo, hi) => Math.min(Math.max(x, lo), hi);
+  const explorerTx = (hash) => `https://megaexplorer.xyz/tx/${hash}`;
 
-<!-- (All JS from your working file continues unchanged… wallet, calc, tweets) -->
-<script>
-/* … keep the rest of your JS exactly as in your last working version … */
-/* For brevity here, reuse the same wallet/calculator/tweet scripts you already deployed. */
+  // ---------- Equal-height utilities (desktop only) ----------
+  function isDesktop(){ return window.innerWidth >= 992; }
+
+  // Engage top: make the two left images equal total height with cards 1–3
+  function syncEngageHeights(){
+    const left=document.getElementById('engage-left');
+    const cards=document.getElementById('engage-cards123');
+    if(!left||!cards){return;}
+    const halves=left.querySelectorAll('.engage-half');
+    if(!isDesktop()){ halves.forEach(el=>el.style.height=''); return; }
+    const h=cards.getBoundingClientRect().height||0;
+    const gap=parseFloat(getComputedStyle(left).gap||'16');
+    const half=Math.max(100,(h-gap)/2);
+    halves.forEach(el=>el.style.height=half+'px');
+  }
+
+  // Bad Bunnz row: make the BJJ image match the bunny image height
+  function syncBunnzRow(){
+    const left=$('bunnzMeme'), right=$('bjjMeme');
+    if(!left||!right){return;}
+    if(!isDesktop()){ left.style.height=''; right.style.height=''; return; }
+    const h = left.getBoundingClientRect().height;
+    right.style.height = h + 'px';
+  }
+
+  // Allocation row: two memes stack to equal card height
+  function syncAllocRow(){
+    const card=$('allocCard'), imgs=$('allocImgs');
+    if(!card||!imgs){return;}
+    const tiles=imgs.querySelectorAll('.alloc-img');
+    if(!isDesktop()){ tiles.forEach(t=>t.style.height=''); return; }
+    const h=card.getBoundingClientRect().height||0;
+    const gap=16; // mb-3 between the two memes
+    const each=Math.max(100,(h-gap)/2);
+    tiles.forEach(t=>t.style.height=each+'px');
+  }
+
+  // Compare row: two memes stack to equal card height
+  function syncCompareRow(){
+    const card=$('compareCard'), imgs=$('compareImgs');
+    if(!card||!imgs){return;}
+    const tiles=imgs.querySelectorAll('.compare-img');
+    if(!isDesktop()){ tiles.forEach(t=>t.style.height=''); return; }
+    const h=card.getBoundingClientRect().height||0;
+    const gap=16;
+    const each=Math.max(100,(h-gap)/2);
+    tiles.forEach(t=>t.style.height=each+'px');
+  }
+
+  function syncAllHeights(){
+    syncEngageHeights();
+    syncBunnzRow();
+    syncAllocRow();
+    syncCompareRow();
+  }
+  window.addEventListener('load', ()=>setTimeout(syncAllHeights, 200));
+  window.addEventListener('resize', ()=>{ clearTimeout(window.__eqT); window.__eqT=setTimeout(syncAllHeights, 120); });
+
+  // ---------- Chain params ----------
+  const chainParams = {
+    chainId: '0x18C6', // 6342
+    chainName: 'MegaETH Testnet',
+    nativeCurrency: { name: 'MegaETH Testnet Ether', symbol: 'ETH', decimals: 18 },
+    rpcUrls: ['https://carrot.megaeth.com/rpc'],
+    blockExplorerUrls: ['https://megaexplorer.xyz']
+  };
+
+  // ---------- Wallet / Network ----------
+  let provider, signer;
+
+  function requireMM(){
+    if (!window.ethereum) { alertBox('MetaMask not detected. Install it to use this dApp.', 'warning'); throw new Error('No MetaMask'); }
+  }
+  async function refreshBasics(){
+    if (!provider || !signer) return;
+    const net = await provider.getNetwork();
+    $('network').textContent = `${net.name || 'Unknown'} (chainId ${Number(net.chainId)})`;
+    const addr = await signer.getAddress();
+    $('account').textContent = addr;
+    const bal = await provider.getBalance(addr);
+    $('balance').textContent = `${ethers.formatEther(bal)} ETH`;
+  }
+
+  $('btnConnect').onclick = async () => {
+    try {
+      requireMM();
+      provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      signer = await provider.getSigner();
+      alertBox('Wallet connected.', 'success');
+      refreshBasics();
+    } catch (e) { alertBox('Connect failed: ' + e.message, 'danger'); }
+  };
+  $('btnAddNet').onclick = async () => {
+    try {
+      requireMM();
+      await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
+      alertBox('MegaETH Testnet added to MetaMask.', 'success');
+      refreshBasics();
+    } catch (e) { alertBox('Add network failed: ' + e.message, 'danger'); }
+  };
+  $('btnSwitch').onclick = async () => {
+    try {
+      requireMM();
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: chainParams.chainId }] });
+      alertBox('Switched to MegaETH Testnet.', 'success');
+      refreshBasics();
+    } catch (e) {
+      if (e.code === 4902) {
+        try {
+          await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
+          alertBox('MegaETH Testnet added and switched.', 'success');
+          refreshBasics();
+        } catch (e2) { alertBox('Switch/add failed: ' + e2.message, 'danger'); }
+      } else { alertBox('Switch failed: ' + e.message, 'danger'); }
+    }
+  };
+
+  // ---------- Test Tx ----------
+  $('btnSendTx').onclick = async () => {
+    try {
+      if (!signer) throw new Error('Connect wallet first.');
+      const amt = $('txAmount').value.trim();
+      const maxFeeGwei = $('maxFee').value.trim();
+      const to = await signer.getAddress(); // self-transfer
+      $('txStatus').textContent = 'Sending…';
+      const tx = await signer.sendTransaction({
+        to,
+        value: ethers.parseEther(amt),
+        maxFeePerGas: ethers.parseUnits(maxFeeGwei, 'gwei'),
+        maxPriorityFeePerGas: ethers.parseUnits((Number(maxFeeGwei)/2).toString(), 'gwei')
+      });
+      $('txStatus').innerHTML = `Submitted: <a href="${explorerTx(tx.hash)}" target="_blank">${tx.hash}</a> — waiting…`;
+      const rcpt = await tx.wait();
+      $('txStatus').innerHTML = `Confirmed in block ${rcpt.blockNumber}. <a href="${explorerTx(tx.hash)}" target="_blank">View on explorer</a>`;
+      refreshBasics();
+    } catch (e) { $('txStatus').textContent = 'Error: ' + e.message; }
+  };
+
+  // ---------- Contract interaction ----------
+  const COUNTER_ABI = [
+    { "inputs": [], "name": "count", "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view","type":"function" },
+    { "inputs":[{"internalType":"string","name":"message","type":"string"}], "name":"increment", "outputs":[], "stateMutability":"nonpayable", "type":"function" },
+    { "anonymous":false,"inputs":[
+        {"indexed":true,"internalType":"address","name":"by","type":"address"},
+        {"indexed":false,"internalType":"uint256","name":"newCount","type":"uint256"},
+        {"indexed":false,"internalType":"string","name":"message","type":"string"}],
+      "name":"Increment","type":"event"}
+  ];
+  let counter;
+  $('btnLoadCtr').onclick = async () => {
+    try {
+      if (!signer) throw new Error('Connect wallet first.');
+      const addr = $('ctrAddr').value.trim();
+      if (!ethers.isAddress(addr)) throw new Error('Invalid contract address.');
+      counter = new ethers.Contract(addr, COUNTER_ABI, signer);
+      $('ctrStatus').textContent = 'Loaded. Try Read or Increment.';
+    } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
+  };
+  $('btnRead').onclick = async () => {
+    try {
+      if (!counter) throw new Error('Load a contract address first.');
+      $('ctrStatus').textContent = 'Reading…';
+      const c = await counter.count();
+      $('ctrStatus').textContent = `count() = ${c.toString()}`;
+    } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
+  };
+  $('btnInc').onclick = async () => {
+    try {
+      if (!counter) throw new Error('Load a contract address first.');
+      const message = $('msg').value || 'hello from MegaEngage';
+      $('ctrStatus').textContent = 'Sending increment()…';
+      const tx = await counter.increment(message);
+      $('ctrStatus').innerHTML = `Submitted: <a href="${explorerTx(tx.hash)}" target="_blank">${tx.hash}</a> — waiting…`;
+      const rcpt = await tx.wait();
+      $('ctrStatus').innerHTML = `Incremented in block ${rcpt.blockNumber}. <a href="${explorerTx(tx.hash)}" target="_blank">Explorer</a>`;
+    } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
+  };
+
+  // ---------- Calculator ----------
+  const inputs = ['bid','price','discount','bonus','supply','fdvPreset','fdvCustom','apy','compound'];
+  inputs.forEach(id => $(id)?.addEventListener('input', recalc));
+  $('toggleLock')?.addEventListener('click', () => {
+    const d = parseFloat($('discount').value||0);
+    $('discount').value = (d>0?0:10).toString();
+    recalc();
+  });
+  $('fdvPreset')?.addEventListener('change', () => {
+    const v = $('fdvPreset').value;
+    if (v !== 'custom') $('fdvCustom').value = v;
+    recalc();
+  });
+
+  // coin switcher (desktop select + mobile buttons)
+  const COIN_APY_PRESET = {ATOM:20, XRP:5, ADA:12, DOT:12};
+  function setCoin(sym){
+    if (!$('coinSelect')) return;
+    $('coinSelect').value = sym;
+    $('coinLabel').textContent = sym;
+    $('coinLabel2').textContent = sym;
+    $('coinLabel3').textContent = sym;
+    // preset APY
+    if (COIN_APY_PRESET[sym] != null) { $('apy').value = COIN_APY_PRESET[sym]; }
+    recalc();
+  }
+  $('coinSelect')?.addEventListener('change', e=> setCoin(e.target.value));
+  document.querySelectorAll('#coinButtons [data-coin]')?.forEach(b=>b.addEventListener('click', ()=>setCoin(b.dataset.coin)));
+
+  document.querySelectorAll('[data-chg]')?.forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-chg]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); // cosmetic
+  }));
+  $('useBonusForBreakeven')?.addEventListener('change', recalc);
+
+  function vals(){
+    const bid = +($('bid')?.value||0);
+    const price = +($('price')?.value||0);
+    const discount = clamp(+($('discount')?.value||0), 0, 50) / 100;
+    const bonus = clamp(+($('bonus')?.value||0), 0, 100) / 100;
+    const supply = +($('supply')?.value||0);
+    const fdv = +($('fdvCustom')?.value||0);
+    const apy = +($('apy')?.value||0)/100;
+    const compound = parseInt($('compound')?.value||12,10);
+    return {bid, price, discount, bonus, supply, fdv, apy, compound};
+  }
+
+  function recalc(){
+    const v = vals();
+    if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) {
+      ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>$(id)?.textContent='—');
+      $('breakevenRows') && ($('breakevenRows').innerHTML = '');
+      buildTweetPreview(); 
+      setTimeout(syncAllHeights, 50);
+      return;
+    }
+    const effPrice = v.price * (1 - v.discount);
+    const tokensBase = v.bid / effPrice;
+    const tokensBonus = tokensBase * (1 + v.bonus);
+    const tgePrice = v.fdv / v.supply;
+    const valBase = tokensBase * tgePrice;
+    const valBonus = tokensBonus * tgePrice;
+    const roiBase = (valBase - v.bid) / v.bid * 100;
+    const roiBonus = (valBonus - v.bid) / v.bid * 100;
+
+    $('effPrice').textContent = '$' + fmtPrice(effPrice);
+    $('tokensBase').textContent = fmtNum(tokensBase);
+    $('tokensBonus').textContent = fmtNum(tokensBonus);
+    $('tgePrice').textContent = '$' + fmtPrice(tgePrice);
+    $('valBase').textContent = fmtUSD(valBase);
+    $('valBonus').textContent = fmtUSD(valBonus);
+    $('roiBase').textContent = (roiBase>=0?'+':'') + fmtNum(roiBase) + '%';
+    $('roiBonus').textContent = (roiBonus>=0?'+':'') + fmtNum(roiBonus) + '%';
+
+    // Breakeven table
+    const compound = v.compound;
+    const atomScenarios = [-0.30, 0, 0.50];
+    const factor = Math.pow(1 + (v.apy/compound), compound);
+    const useBonus = $('useBonusForBreakeven')?.checked;
+    const tokensForBreakeven = useBonus ? tokensBonus : tokensBase;
+    if ($('breakevenRows')){
+      $('breakevenRows').innerHTML = atomScenarios.map(chg => {
+        const endValue = v.bid * factor * (1 + chg);
+        const neededPrice = tokensForBreakeven>0 ? endValue / tokensForBreakeven : NaN;
+        const neededFDV = neededPrice * v.supply;
+        return `<tr>
+          <td>${(chg*100>0?'+':'')}${(chg*100).toFixed(0)}%</td>
+          <td class="mono">${fmtUSD(endValue)}</td>
+          <td class="mono">$${fmtPrice(neededPrice)}</td>
+          <td class="mono">${neededFDV>0?('$'+neededFDV.toLocaleString()):'—'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    buildTweetPreview();
+    setTimeout(syncAllHeights, 50);
+  }
+
+  // ---------- CSV Export ----------
+  $('btnCSV')?.addEventListener('click', () => {
+    const v = vals();
+    if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) { alertBox('Fill bid, price, supply, FDV first.', 'warning'); return; }
+    const effPrice = v.price*(1-v.discount);
+    const tokensBase = v.bid/effPrice;
+    const tokensBonus = tokensBase*(1+v.bonus);
+    const tgePrice = v.fdv/v.supply;
+    const valBase = tokensBase*tgePrice, valBonus = tokensBonus*tgePrice;
+    const roiBase = (valBase-v.bid)/v.bid*100, roiBonus=(valBonus-v.bid)/v.bid*100;
+
+    const factorMonthly = Math.pow(1+(v.apy/12),12);
+    const endFlat = v.bid * factorMonthly;
+
+    const rows = [
+      ['Parameter','Value'],
+      ['Bid (USDT)', v.bid],
+      ['Clearing price P', v.price],
+      ['Lock discount %', (v.discount*100).toFixed(2)],
+      ['Bonus %', (v.bonus*100).toFixed(2)],
+      ['Supply', v.supply],
+      ['TGE FDV', v.fdv],
+      ['TGE price', tgePrice],
+      [],
+      ['Metric','No bonus','With bonus'],
+      ['Effective paid price', effPrice, effPrice],
+      ['Tokens', tokensBase, tokensBonus],
+      ['Value @ TGE', valBase, valBonus],
+      ['ROI %', roiBase, roiBonus],
+      [],
+      ['Staking APY % (12m, monthly comp.)', (v.apy*100).toFixed(2)],
+      ['End value if holding flat', endFlat],
+      [],
+      ['Δ','End value (holding)','Breakeven TGE px','Breakeven FDV']
+    ];
+
+    [-0.30,0,0.50].forEach(chg=>{
+      const endValue = v.bid * Math.pow(1+(v.apy/12),12) * (1+chg);
+      const priceReq = endValue / (tokensBonus>0 ? tokensBonus : tokensBase);
+      rows.push([(chg*100)+'%', endValue, priceReq, priceReq*v.supply]);
+    });
+
+    const csv = rows.map(r => (r||[]).map(c => {
+      const s = (c===undefined||c===null) ? '' : String(c);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+    }).join(',')).join('\n');
+
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'}); const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    const ts = new Date().toISOString().replace(/[:.]/g,'-');
+    a.download = `mega_calculator_${ts}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  });
+
+  // ---------- Tweet badge (restored) ----------
+  function buildTweetPreview(){
+    const v = vals();
+    const eff = (v.price>0) ? v.price*(1-v.discount) : NaN;
+    const tokens = (v.bid>0 && eff>0) ? v.bid/eff : 0;
+    const tgePx = (v.fdv>0 && v.supply>0) ? v.fdv/v.supply : 0;
+    const roi = (tokens*tgePx>0 && v.bid>0) ? ((tokens*tgePx - v.bid)/v.bid*100) : 0;
+
+    const bidLine = `Bid: $${(v.bid||0).toLocaleString()} • Lock: ${(v.discount*100||0).toFixed(0)}% • Eff: $${isFinite(eff)?eff.toFixed(5):'—'}`;
+    const tokLine = `Tokens≈ ${isFinite(tokens)?Math.round(tokens).toLocaleString():'—'} • TGE FDV $${(v.fdv||0).toLocaleString()} • TGE px≈ $${isFinite(tgePx)?tgePx.toFixed(3):'—'}`;
+    const roiLine = `Est. TGE ROI≈ ${isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(1)+'%':'—'}`;
+
+    const intros = [
+      "🤖 Mega Engage!\nI have farmed @megaeth_labs testnet, calculated my dream allocation and even convinced myself to dump my dead bags to buy some $MEGA!",
+      "🤖 Mega Engage!\nGrinding @megaeth_labs testnet, ran the calculator, and rotating out of the fossils into $MEGA.",
+      "🤖 Mega Engage!\nFarming @megaeth_labs testnet + the airdrop tool — I’m ditching the dead weight for $MEGA.",
+      "🤖 Mega Engage!\nAuction math + testnet receipts say it’s time: reallocating into $MEGA.",
+      "🤖 Mega Engage!\nCalculator done. Testnet done. I just moved the dusty bags toward $MEGA."
+    ];
+
+    const repo = $('repoUrl')?.value?.trim(); 
+    const site = $('siteUrl')?.value?.trim(); 
+    const handle = $('xHandle')?.value?.trim();
+    const txs = $('txHashes')?.value?.trim().split('\n').filter(Boolean) || [];
+    const tail = [
+      repo ? `Repo: ${repo}` : null,
+      site ? `Live: ${site}` : null,
+      txs.length ? `Tx: ${txs.slice(0,5).join(' ')}` : null,
+      handle ? `cc ${handle}` : null,
+      "#MegaETH #L2 #web3 #MegaEngage"
+    ].filter(Boolean).join('\n');
+
+    const posts = intros.map(intro => [intro, bidLine, tokLine, roiLine, tail].filter(Boolean).join('\n'));
+
+    // fill 5 boxes + links
+    for(let i=1;i<=5;i++){
+      const out = $('tweetOut'+i); const link = $('tweetLink'+i);
+      if (!out || !link) continue;
+      out.value = posts[i-1] || posts[0];
+      link.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(out.value);
+    }
+  }
+  $('btnBuildTweet')?.addEventListener('click', buildTweetPreview);
+  document.querySelectorAll('[data-copy]')?.forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const sel = btn.getAttribute('data-copy');
+      const txt = document.querySelector(sel)?.value || '';
+      try{ await navigator.clipboard.writeText(txt); alertBox('Tweet copied to clipboard!', 'success'); }
+      catch(e){ alertBox('Copy failed: '+e.message, 'danger'); }
+    });
+  });
+
+  // ---------- React to account/network changes ----------
+  if (window.ethereum) {
+    window.ethereum.on('accountsChanged', () => location.reload());
+    window.ethereum.on('chainChanged', () => location.reload());
+  }
+
+  // init
+  setCoin('ATOM'); // default
+  recalc();
+})();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
