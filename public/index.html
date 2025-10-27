@@ -35,7 +35,8 @@
     @media (min-width:992px){.banner-logo{max-height:288px}} /* ~4x desktop */
 
     .mid-hero{background:var(--card);border-bottom:1px solid var(--border)}
-    .mid-hero .page-header,* .mid-hero .page-header{color:#fff!important}
+    .mid-hero .page-header{color:#fff!important}
+    .mid-hero .page-header .muted{color:#e8edf4!important}
 
     .content-shell{background:var(--page-bottom)}
 
@@ -49,23 +50,17 @@
     .muted{color:var(--fg-muted)!important}
     .divider{height:1px;background:var(--border);margin:1rem 0}
 
-    .form-control,.form-select{background:#0f141a;border:1px solid var(--border);color:var(--fg)}
+    .form-control,.form-select{background:#0f141a;border:1px solid var(--border);color:#f7f9fc}
     .form-control::placeholder{color:#b8c1cc}
+    .form-check-label{color:#f7f9fc!important}
     .btn{border-radius:12px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;color:#fff!important}
 
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;color:var(--fg-strong)!important}
-    .card .small,.card small{color:var(--fg)!important}
-    .form-check-label{color:var(--fg)!important}
-
-    .table{
-      --bs-table-color:#f7f9fc;--bs-table-bg:transparent;--bs-table-border-color:#3a414b;
+    .table{--bs-table-color:#f7f9fc;--bs-table-bg:transparent;--bs-table-border-color:#3a414b;
       --bs-table-striped-bg:rgba(255,255,255,.06);--bs-table-striped-color:#f7f9fc;
-      --bs-table-hover-bg:rgba(255,255,255,.10);--bs-table-hover-color:#f7f9fc;
-      color:var(--bs-table-color)!important;background-color:var(--bs-table-bg)!important
-    }
+      --bs-table-hover-bg:rgba(255,255,255,.10);--bs-table-hover-color:#f7f9fc;}
     .table thead th{color:var(--thead)!important;background:var(--thead-bg)!important;border-bottom-color:#3a414b!important;font-weight:600}
-    .table tbody td,.table tbody th,.table tbody tr{color:#f7f9fc!important;background:transparent!important;border-color:#3a414b!important}
-    .table-responsive{ -webkit-overflow-scrolling:touch; background:transparent!important; }
+    .table td,.table th{border-color:#3a414b!important}
 
     /* Meme tiles */
     .meme{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 6px 18px rgba(0,0,0,.12);background:#000}
@@ -74,15 +69,22 @@
     .meme-4x3{aspect-ratio:4/3}
     .meme-square{aspect-ratio:1/1}
     .meme-tall{aspect-ratio:3/4}
-    .meme-hide-sm{display:block}
-    @media (max-width: 991.98px){.meme-hide-sm{display:none!important}} /* hide some tiles on mobile */
-
-    /* ensure selector above tables on mobile */
-    #coinSelect{z-index:5;position:relative}
-    #pane-calc .card{overflow:visible}
-
-    /* vertical stack spacing helper */
     .stack > * + *{margin-top:1rem}
+
+    /* Engage: make left memes match height of cards 1–3 on desktop */
+    #engage-left .engage-half{height:auto}
+    @media (min-width: 992px){
+      #engage-left{gap:1rem}
+      /* JS fills inline height on .engage-half for desktop */
+    }
+
+    /* Tweet aside image 33% smaller on xl+ */
+    @media (min-width:1200px){
+      .tweet-aside{max-width:66%; margin-left:auto;}
+    }
+
+    /* Ensure long code blocks scroll */
+    .card pre{max-height:320px; overflow:auto}
   </style>
 </head>
 <body>
@@ -125,24 +127,25 @@
 
       <!-- ================= ENGAGE ================= -->
       <div class="tab-pane fade show active" id="pane-engage">
-        <div class="row g-3">
-          <!-- Left meme column -->
-          <div class="col-12 col-lg-6 stack">
-            <div class="meme meme-16x9">
-              <img loading="lazy" src="assets/memes/engage_bunny_noservices.webp"
-                   onerror="this.onerror=null;this.src='assets/memes/engage_bunny_noservices.jpg';"
-                   alt="Mega bunny lore: No sexual services">
-            </div>
-            <div class="meme meme-16x9 meme-hide-sm">
-              <img loading="lazy" src="assets/memes/engage_lan_cafe.webp"
-                   onerror="this.onerror=null;this.src='assets/memes/engage_lan_cafe.jpg';"
-                   alt="LAN cafe nostalgia">
+        <!-- Row 1: Left memes match height of cards 1–3; right stack 1–3 -->
+        <div class="row g-3 align-items-stretch">
+          <div class="col-12 col-lg-6">
+            <div id="engage-left" class="d-flex flex-column h-100">
+              <div class="meme engage-half">
+                <img loading="lazy" src="assets/memes/engage_bunny_noservices.webp"
+                     onerror="this.onerror=null;this.src='assets/memes/engage_bunny_noservices.jpg';"
+                     alt="Mega bunny lore: No sexual services">
+              </div>
+              <div class="meme engage-half">
+                <img loading="lazy" src="assets/memes/engage_lan_cafe.webp"
+                     onerror="this.onerror=null;this.src='assets/memes/engage_lan_cafe.jpg';"
+                     alt="LAN cafe nostalgia">
+              </div>
             </div>
           </div>
 
-          <!-- Right cards column (1,2,3 stacked + 4) -->
           <div class="col-12 col-lg-6">
-            <div class="stack">
+            <div id="engage-cards123" class="stack h-100">
               <!-- 1) Connect -->
               <div class="card p-3">
                 <h2 class="h5 mb-3">1) Connect & Add MegaETH Testnet</h2>
@@ -192,7 +195,7 @@
                 </div>
                 <div class="mt-3 small mono" id="ctrStatus" style="min-height:1.5rem;"></div>
                 <div class="divider"></div>
-                <details>
+                <details open>
                   <summary class="mb-2">Show <code>MegaCounter.sol</code> (Solidity 0.8.20+)</summary>
 <pre class="mono" style="white-space:pre-wrap;background:#0f141a;border:1px solid var(--border);border-radius:12px;padding:12px;">
 // SPDX-License-Identifier: MIT
@@ -209,13 +212,29 @@ contract MegaCounter {
 </pre>
                 </details>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <!-- 4) Bad Bunnz -->
-              <div class="card p-3">
-                <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
-                <p class="muted mb-3">Bad Bunnz is <em>probably</em> the leading web3 project on MegaETH right now.</p>
-                <a class="btn btn-success" href="https://opensea.io/collection/bad-bunnz" target="_blank" rel="noreferrer">Browse on OpenSea</a>
-              </div>
+        <!-- Row 2: Bad Bunnz card on left + bunny meme; BJJ escape meme on right -->
+        <div class="row g-3 mt-1">
+          <div class="col-12 col-lg-6">
+            <div class="card p-3 mb-3">
+              <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
+              <p class="muted mb-3">Bad Bunnz is <em>probably</em> the leading web3 project on MegaETH right now.</p>
+              <a class="btn btn-success" href="https://opensea.io/collection/bad-bunnz" target="_blank" rel="noreferrer">Browse on OpenSea</a>
+            </div>
+            <div class="meme meme-4x3">
+              <img loading="lazy" src="assets/memes/engage_badbunnz.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/engage_badbunnz.jpg';"
+                   alt="Bad Bunnz lore: bunny with money stack">
+            </div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <div class="meme meme-16x9 h-100">
+              <img loading="lazy" src="assets/memes/compare_bjj_escape.webp"
+                   onerror="this.onerror=null;this.src='assets/memes/compare_bjj_escape.jpg';"
+                   alt="Jiu-jitsu escape tip">
             </div>
           </div>
         </div>
@@ -223,7 +242,8 @@ contract MegaCounter {
 
       <!-- ================= CALCULATOR ================= -->
       <div class="tab-pane fade" id="pane-calc">
-        <!-- Row 1: big meme (left) + inputs (right) -->
+        <!-- same as before (omitted here for brevity in comment) -->
+        <!-- … START Calculator row 1 … -->
         <div class="row g-3 align-items-stretch">
           <div class="col-12 col-lg-6">
             <div class="meme meme-4x3">
@@ -248,7 +268,7 @@ contract MegaCounter {
           </div>
         </div>
 
-        <!-- Row 2: Allocation card + two memes -->
+        <!-- Allocation card + 2 memes -->
         <div class="row g-3 mt-1">
           <div class="col-lg-6">
             <div class="card p-3 h-100">
@@ -267,14 +287,14 @@ contract MegaCounter {
               <div class="mt-3"><button id="btnCSV" class="btn btn-outline-light btn-sm">Download CSV</button></div>
             </div>
           </div>
-          <div class="col-lg-3 meme-hide-sm">
+          <div class="col-lg-3">
             <div class="meme meme-16x9 h-100">
               <img loading="lazy" src="assets/memes/alloc_atm_bill.webp"
                    onerror="this.onerror=null;this.src='assets/memes/alloc_atm_bill.jpg';"
                    alt="ATM eats bill">
             </div>
           </div>
-          <div class="col-lg-3 meme-hide-sm">
+          <div class="col-lg-3">
             <div class="meme meme-16x9 h-100">
               <img loading="lazy" src="assets/memes/alloc_porsche_kittens.webp"
                    onerror="this.onerror=null;this.src='assets/memes/alloc_porsche_kittens.jpg';"
@@ -283,7 +303,7 @@ contract MegaCounter {
           </div>
         </div>
 
-        <!-- Row 3: Compare card + two memes -->
+        <!-- Compare card (unchanged content) -->
         <div class="row g-3 mt-1">
           <div class="col-lg-6">
             <div class="card p-3 h-100">
@@ -328,29 +348,18 @@ contract MegaCounter {
             </div>
           </div>
 
-          <div class="col-lg-3 meme-hide-sm">
+          <div class="col-lg-3">
             <div class="meme meme-4x3 h-100">
               <img loading="lazy" src="assets/memes/compare_vr_kid_cash.webp"
                    onerror="this.onerror=null;this.src='assets/memes/compare_vr_kid_cash.jpg';"
                    alt="Vision Pro + kid with cash">
             </div>
           </div>
-          <div class="col-lg-3 meme-hide-sm">
+          <div class="col-lg-3">
             <div class="meme meme-4x3 h-100">
               <img loading="lazy" src="assets/memes/compare_bing_bong.webp"
                    onerror="this.onerror=null;this.src='assets/memes/compare_bing_bong.jpg';"
                    alt="Bing bong energy">
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 4: extra meme beside Bad Bunnz vibe -->
-        <div class="row g-3 mt-1">
-          <div class="col-lg-6 meme-hide-sm">
-            <div class="meme meme-16x9">
-              <img loading="lazy" src="assets/memes/compare_bjj_escape.webp"
-                   onerror="this.onerror=null;this.src='assets/memes/compare_bjj_escape.jpg';"
-                   alt="Jiu-jitsu escape tip">
             </div>
           </div>
         </div>
@@ -381,7 +390,7 @@ contract MegaCounter {
               </div>
 
               <!-- Meme strip between tweets -->
-              <div class="meme meme-16x9 mb-3 meme-hide-sm">
+              <div class="meme meme-16x9 mb-3">
                 <img loading="lazy" src="assets/memes/tweets_please_dont_poop.webp"
                      onerror="this.onerror=null;this.src='assets/memes/tweets_please_dont_poop.jpg';"
                      alt="Please don't poop sign">
@@ -419,9 +428,9 @@ contract MegaCounter {
             </div>
           </div>
 
-          <!-- Right: big photographers meme -->
+          <!-- Right: photographers meme 33% smaller -->
           <div class="col-12 col-xl-5">
-            <div class="meme meme-tall h-100">
+            <div class="meme meme-tall h-100 tweet-aside">
               <img loading="lazy" src="assets/memes/tweets_photogs_swimsuit.webp"
                    onerror="this.onerror=null;this.src='assets/memes/tweets_photogs_swimsuit.jpg';"
                    alt="Photographers swarm meme">
@@ -440,6 +449,27 @@ contract MegaCounter {
     </footer>
   </div>
 </div>
+
+<script>
+/* --- equalize left memes to height of cards 1–3 on desktop --- */
+function syncEngageHeights(){
+  const left = document.getElementById('engage-left');
+  const cards = document.getElementById('engage-cards123');
+  if(!left || !cards){return;}
+  // reset on mobile
+  if(window.innerWidth < 992){
+    left.querySelectorAll('.engage-half').forEach(el=>el.style.height='');
+    return;
+  }
+  const h = cards.getBoundingClientRect().height || 0;
+  const gap = parseFloat(getComputedStyle(left).gap||'16');
+  const half = Math.max(100, (h - gap) / 2);
+  left.querySelectorAll('.engage-half').forEach(el=>el.style.height = half+'px');
+}
+let __resizeTO;
+window.addEventListener('load', syncEngageHeights);
+window.addEventListener('resize', ()=>{ clearTimeout(__resizeTO); __resizeTO=setTimeout(syncEngageHeights,120); });
+</script>
 
 <script>
 function waitForEthers(){
@@ -502,6 +532,7 @@ waitForEthers().then(() => {
       signer = await provider.getSigner();
       alertBox('Wallet connected.', 'success');
       refreshBasics();
+      syncEngageHeights();
     } catch (e) { alertBox('Connect failed: ' + (e?.message||e), 'danger'); }
   };
   $('btnAddNet').onclick = async () => {
