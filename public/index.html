@@ -202,21 +202,29 @@ contract MegaCounter {
           </div>
         </div>
 
-        <!-- 4) Bad Bunnz row -->
-        <div class="row g-3 mt-1 align-items-stretch" id="row-bunnz">
-          <div class="col-12 col-lg-6">
-            <div class="card p-3 mb-3" id="bunnzCard">
+        <!-- 4) Bad Bunnz: CARD FULL-WIDTH, then two memes side-by-side -->
+        <div class="row g-3 mt-1" id="row-bunnz">
+          <!-- full-width card -->
+          <div class="col-12">
+            <div class="card p-3" id="bunnzCard">
               <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
               <p class="muted mb-3">Bad Bunnz is <em>probably</em> the leading web3 project on MegaETH right now.</p>
               <a class="btn btn-success" href="https://opensea.io/collection/bad-bunnz" target="_blank" rel="noreferrer">Browse on OpenSea</a>
             </div>
-            <div class="meme meme-4x3" id="bunnzMeme">
-              <img loading="lazy" src="assets/memes/engage_badbunnz.webp" onerror="this.onerror=null;this.src='assets/memes/engage_badbunnz.jpg';" alt="">
-            </div>
           </div>
-          <div class="col-12 col-lg-6">
-            <div class="meme meme-4x3 shrink-85" id="bjjMeme">
-              <img loading="lazy" src="assets/memes/compare_bjj_escape.webp" onerror="this.onerror=null;this.src='assets/memes/compare_bjj_escape.jpg';" alt="">
+          <!-- memes row -->
+          <div class="col-12">
+            <div class="row g-3 align-items-stretch">
+              <div class="col-12 col-lg-6">
+                <div class="meme meme-4x3" id="bunnzMeme">
+                  <img loading="lazy" src="assets/memes/engage_badbunnz.webp" onerror="this.onerror=null;this.src='assets/memes/engage_badbunnz.jpg';" alt="">
+                </div>
+              </div>
+              <div class="col-12 col-lg-6">
+                <div class="meme meme-4x3" id="bjjMeme">
+                  <img loading="lazy" src="assets/memes/compare_bjj_escape.webp" onerror="this.onerror=null;this.src='assets/memes/compare_bjj_escape.jpg';" alt="">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -433,16 +441,13 @@ contract MegaCounter {
     halves.forEach(el=>el.style.height=half+'px');
   }
 
-  // Bad Bunnz row: align escape image top with top of bunny image and match heights
+  // Bad Bunnz row (now simple: memes are same row, same aspect → just clear manual offsets)
   function syncBunnzRow(){
-    const leftCard=$('bunnzCard'), leftImg=$('bunnzMeme'), right=$('bjjMeme');
-    if(!(leftCard&&leftImg&&right)){return;}
-    if(!isDesktop()){ right.style.marginTop=''; leftImg.style.height=''; right.style.height=''; return; }
-    const imgH = leftImg.getBoundingClientRect().height;
-    right.style.height = imgH + 'px';
-    // offset right image so its top lines up with top of left image (below the card)
-    const gap=16; // mb-3 between card and image on left
-    right.style.marginTop = (leftCard.getBoundingClientRect().height + gap) + 'px';
+    const leftImg=document.getElementById('bunnzMeme');
+    const rightImg=document.getElementById('bjjMeme');
+    if(!(leftImg&&rightImg)){return;}
+    if(!isDesktop()){ leftImg.style.height=''; rightImg.style.height=''; return; }
+    // With identical 4:3 boxes, heights already match; no offset needed.
   }
 
   function syncAllocRow(){
