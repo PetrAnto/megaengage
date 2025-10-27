@@ -7,8 +7,16 @@
   <meta name="description" content="MegaETH testnet dApp (network, tx, contract) + MEGA airdrop calculator + tweet badge.">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Ethers UMD + fallback -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
-  <script>if(typeof window.ethers==='undefined'){var s=document.createElement('script');s.src='https://unpkg.com/ethers@6.13.2/dist/ethers.umd.min.js';document.head.appendChild(s);}</script>
+  <script>
+    if (typeof window.ethers === 'undefined') {
+      var s=document.createElement('script');
+      s.src='https://unpkg.com/ethers@6.13.2/dist/ethers.umd.min.js';
+      document.head.appendChild(s);
+    }
+  </script>
 
   <style>
     :root{
@@ -25,7 +33,7 @@
 
     .top-shell,.banner-wrap{background:var(--page-top)}
     .banner-wrap{border-bottom:1px solid #c6c6c6}
-    .banner-logo{max-height:158px}
+    .banner-logo{max-height:88px}
     @media (min-width:576px){.banner-logo{max-height:120px}}
     @media (min-width:992px){.banner-logo{max-height:288px}}
 
@@ -67,11 +75,9 @@
     @media (max-width: 991.98px){ .shrink-85{max-width:100%;} }
     @media (min-width:1200px){ .tweet-aside{max-width:66%; margin-left:auto;} }
 
-    /* Card 3 compact code area */
     .code-pane pre{max-height:180px; overflow:auto}
     .code-pane details{margin-top:.5rem}
     .code-pane summary{cursor:pointer}
-
   </style>
 </head>
 <body>
@@ -158,7 +164,7 @@
                 <div class="mt-3 small mono" id="txStatus" style="min-height:1.5rem;"></div>
               </div>
 
-              <!-- 3) Contract (compact two columns) -->
+              <!-- 3) Contract -->
               <div class="card p-3" id="ctrCard">
                 <h2 class="h5 mb-3">3) Interact with your Counter Contract</h2>
                 <div class="row g-3">
@@ -202,9 +208,8 @@ contract MegaCounter {
           </div>
         </div>
 
-        <!-- 4) Bad Bunnz: CARD FULL-WIDTH, then two memes side-by-side -->
+        <!-- 4) Bad Bunnz: full-width card then two memes -->
         <div class="row g-3 mt-1" id="row-bunnz">
-          <!-- full-width card -->
           <div class="col-12">
             <div class="card p-3" id="bunnzCard">
               <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
@@ -212,7 +217,6 @@ contract MegaCounter {
               <a class="btn btn-success" href="https://opensea.io/collection/bad-bunnz" target="_blank" rel="noreferrer">Browse on OpenSea</a>
             </div>
           </div>
-          <!-- memes row -->
           <div class="col-12">
             <div class="row g-3 align-items-stretch">
               <div class="col-12 col-lg-6">
@@ -254,7 +258,7 @@ contract MegaCounter {
           </div>
         </div>
 
-        <!-- Allocation + images (match heights) -->
+        <!-- Allocation + images -->
         <div class="row g-3 mt-1 align-items-stretch">
           <div class="col-lg-6">
             <div class="card p-3 h-100">
@@ -283,7 +287,7 @@ contract MegaCounter {
           </div>
         </div>
 
-        <!-- Compare + images (match heights) -->
+        <!-- Compare + images -->
         <div class="row g-3 mt-1 align-items-stretch">
           <div class="col-lg-6">
             <div class="card p-3 h-100" id="compareCard">
@@ -391,7 +395,7 @@ contract MegaCounter {
             </div>
           </div>
 
-          <div class="col-12 col-xl-6">
+          <div class="col-12 col-xl-5">
             <div class="meme meme-tall tweet-aside">
               <img loading="lazy" src="assets/memes/tweets_photogs_swimsuit.webp" onerror="this.onerror=null;this.src='assets/memes/tweets_photogs_swimsuit.jpg';" alt="">
             </div>
@@ -411,403 +415,450 @@ contract MegaCounter {
 </div>
 
 <script>
-(() => {
-  // ---------- Helpers ----------
-  const $ = id => document.getElementById(id);
-  const alertBox = (msg, type='info') => {
-    const el = $('alerts');
-    el.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-      ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
-  };
-  const fmtUSD = n => isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2}) : '—';
-  const fmtNum = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : '—';
-  const fmtPrice = n => isFinite(n) ? n.toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:6}) : '—';
-  const clamp = (x, lo, hi) => Math.min(Math.max(x, lo), hi);
-  const explorerTx = (hash) => `https://megaexplorer.xyz/tx/${hash}`;
-  const parseNum = v => +String(v??'').replace(/\s/g,'').replace(',','.');
+  // Show runtime errors visibly
+  window.addEventListener('error', e => {
+    const el = document.getElementById('alerts');
+    if (el) el.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>JS error:</strong> ${e.message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>`;
+  });
+  window.addEventListener('unhandledrejection', e => {
+    const msg = (e.reason && (e.reason.message || e.reason)) || 'Unhandled promise rejection';
+    const el = document.getElementById('alerts');
+    if (el) el.innerHTML = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Promise error:</strong> ${msg}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>`;
+  });
 
-  // ---------- Equal-height utilities (desktop only) ----------
-  function isDesktop(){ return window.innerWidth >= 992; }
-
-  function syncEngageHeights(){
-    const left=document.getElementById('engage-left');
-    const cards=document.getElementById('engage-cards123');
-    if(!left||!cards){return;}
-    const halves=left.querySelectorAll('.engage-half');
-    if(!isDesktop()){ halves.forEach(el=>el.style.height=''); return; }
-    const h=cards.getBoundingClientRect().height||0;
-    const gap=parseFloat(getComputedStyle(left).gap||'16');
-    const half=Math.max(100,(h-gap)/2);
-    halves.forEach(el=>el.style.height=half+'px');
-  }
-
-  // Bad Bunnz row (now simple: memes are same row, same aspect → just clear manual offsets)
-  function syncBunnzRow(){
-    const leftImg=document.getElementById('bunnzMeme');
-    const rightImg=document.getElementById('bjjMeme');
-    if(!(leftImg&&rightImg)){return;}
-    if(!isDesktop()){ leftImg.style.height=''; rightImg.style.height=''; return; }
-    // With identical 4:3 boxes, heights already match; no offset needed.
-  }
-
-  function syncAllocRow(){
-    const card=$('allocCard'), imgs=$('allocImgs');
-    if(!card||!imgs){return;}
-    const tiles=imgs.querySelectorAll('.alloc-img');
-    if(!isDesktop()){ tiles.forEach(t=>t.style.height=''); return; }
-    const h=card.getBoundingClientRect().height||0;
-    const gap=16;
-    const each=Math.max(100,(h-gap)/2);
-    tiles.forEach(t=>t.style.height=each+'px');
-  }
-
-  function syncCompareRow(){
-    const card=$('compareCard'), imgs=$('compareImgs');
-    if(!card||!imgs){return;}
-    const tiles=imgs.querySelectorAll('.compare-img');
-    if(!isDesktop()){ tiles.forEach(t=>t.style.height=''); return; }
-    const h=card.getBoundingClientRect().height||0;
-    const gap=16;
-    const each=Math.max(100,(h-gap)/2);
-    tiles.forEach(t=>t.style.height=each+'px');
-  }
-
-  function syncAllHeights(){
-    syncEngageHeights(); syncBunnzRow(); syncAllocRow(); syncCompareRow();
-  }
-  window.addEventListener('load', ()=>setTimeout(syncAllHeights, 200));
-  window.addEventListener('resize', ()=>{ clearTimeout(window.__eqT); window.__eqT=setTimeout(syncAllHeights, 120); });
-
-  // ---------- Chain params ----------
-  const chainParams = {
-    chainId: '0x18C6', // 6342
-    chainName: 'MegaETH Testnet',
-    nativeCurrency: { name: 'MegaETH Testnet Ether', symbol: 'ETH', decimals: 18 },
-    rpcUrls: ['https://carrot.megaeth.com/rpc'],
-    blockExplorerUrls: ['https://megaexplorer.xyz']
-  };
-
-  // ---------- Wallet / Network ----------
-  let provider, signer;
-
-  function requireMM(){
-    if (!window.ethereum) { alertBox('MetaMask not detected. Install it to use this dApp.', 'warning'); throw new Error('No MetaMask'); }
-  }
-  async function refreshBasics(){
-    if (!provider || !signer) return;
-    const net = await provider.getNetwork();
-    $('network').textContent = `${net.name || 'Unknown'} (chainId ${Number(net.chainId)})`;
-    const addr = await signer.getAddress();
-    $('account').textContent = addr;
-    const bal = await provider.getBalance(addr);
-    $('balance').textContent = `${ethers.formatEther(bal)} ETH`;
-  }
-
-  $('btnConnect').onclick = async () => {
+  window.addEventListener('DOMContentLoaded', function () {
     try {
-      requireMM();
-      provider = new ethers.BrowserProvider(window.ethereum);
-      await provider.send('eth_requestAccounts', []);
-      signer = await provider.getSigner();
-      alertBox('Wallet connected.', 'success');
-      refreshBasics();
-    } catch (e) { alertBox('Connect failed: ' + e.message, 'danger'); }
-  };
-  $('btnAddNet').onclick = async () => {
-    try {
-      requireMM();
-      await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
-      alertBox('MegaETH Testnet added to MetaMask.', 'success');
-      refreshBasics();
-    } catch (e) { alertBox('Add network failed: ' + e.message, 'danger'); }
-  };
-  $('btnSwitch').onclick = async () => {
-    try {
-      requireMM();
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: chainParams.chainId }] });
-      alertBox('Switched to MegaETH Testnet.', 'success');
-      refreshBasics();
-    } catch (e) {
-      if (e.code === 4902) {
+      // ---------- Helpers ----------
+      const $ = id => document.getElementById(id);
+      const alertBox = (msg, type='info') => {
+        const el = $('alerts');
+        if (!el) return;
+        el.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+          ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+      };
+      const fmtUSD = n => isFinite(n) ? n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2}) : '—';
+      const fmtNum = n => isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:2}) : '—';
+      const fmtPrice = n => isFinite(n) ? n.toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:6}) : '—';
+      const clamp = (x, lo, hi) => Math.min(Math.max(x, lo), hi);
+      const explorerTx = (hash) => `https://megaexplorer.xyz/tx/${hash}`;
+      const parseNum = v => +String(v??'').replace(/\s/g,'').replace(',','.');
+
+      // ---------- Equal-height utilities ----------
+      function isDesktop(){ return window.innerWidth >= 992; }
+      function syncEngageHeights(){
+        const left=$('engage-left'); const cards=$('engage-cards123');
+        if(!left||!cards){return;}
+        const halves=left.querySelectorAll('.engage-half');
+        if(!isDesktop()){ halves.forEach(el=>el.style.height=''); return; }
+        const h=cards.getBoundingClientRect().height||0;
+        const gap=parseFloat(getComputedStyle(left).gap||'16');
+        const half=Math.max(100,(h-gap)/2);
+        halves.forEach(el=>el.style.height=half+'px');
+      }
+      function syncBunnzRow(){
+        const leftImg=$('bunnzMeme'); const rightImg=$('bjjMeme');
+        if(!(leftImg&&rightImg))return;
+        if(!isDesktop()){ leftImg.style.height=''; rightImg.style.height=''; return; }
+      }
+      function syncAllocRow(){
+        const card=$('allocCard'), imgs=$('allocImgs');
+        if(!card||!imgs){return;}
+        const tiles=imgs.querySelectorAll('.alloc-img');
+        if(!isDesktop()){ tiles.forEach(t=>t.style.height=''); return; }
+        const h=card.getBoundingClientRect().height||0;
+        const gap=16;
+        const each=Math.max(100,(h-gap)/2);
+        tiles.forEach(t=>t.style.height=each+'px');
+      }
+      function syncCompareRow(){
+        const card=$('compareCard'), imgs=$('compareImgs');
+        if(!card||!imgs){return;}
+        const tiles=imgs.querySelectorAll('.compare-img');
+        if(!isDesktop()){ tiles.forEach(t=>t.style.height=''); return; }
+        const h=card.getBoundingClientRect().height||0;
+        const gap=16;
+        const each=Math.max(100,(h-gap)/2);
+        tiles.forEach(t=>t.style.height=each+'px');
+      }
+      function syncAllHeights(){
+        syncEngageHeights(); syncBunnzRow(); syncAllocRow(); syncCompareRow();
+      }
+      window.addEventListener('load', ()=>setTimeout(syncAllHeights, 200));
+      window.addEventListener('resize', ()=>{ clearTimeout(window.__eqT); window.__eqT=setTimeout(syncAllHeights, 120); });
+
+      // ---------- Chain params ----------
+      const chainParams = {
+        chainId: '0x18C6', // 6342
+        chainName: 'MegaETH Testnet',
+        nativeCurrency: { name: 'MegaETH Testnet Ether', symbol: 'ETH', decimals: 18 },
+        rpcUrls: ['https://carrot.megaeth.com/rpc'],
+        blockExplorerUrls: ['https://megaexplorer.xyz']
+      };
+
+      // ---------- Wallet / Network ----------
+      let provider, signer;
+
+      function requireMM(){
+        if (!window.ethereum) { alertBox('MetaMask not detected. Install it to use this dApp.', 'warning'); throw new Error('No MetaMask'); }
+      }
+      async function refreshBasics(){
+        if (!provider || !signer) return;
+        const net = await provider.getNetwork();
+        $('network').textContent = `${net.name || 'Unknown'} (chainId ${Number(net.chainId)})`;
+        const addr = await signer.getAddress();
+        $('account').textContent = addr;
+        const bal = await provider.getBalance(addr);
+        $('balance').textContent = `${ethers.formatEther(bal)} ETH`;
+      }
+
+      const btnConnect = $('btnConnect');
+      if (btnConnect) btnConnect.addEventListener('click', async () => {
         try {
-          await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
-          alertBox('MegaETH Testnet added and switched.', 'success');
+          requireMM();
+          provider = new ethers.BrowserProvider(window.ethereum);
+          await provider.send('eth_requestAccounts', []);
+          signer = await provider.getSigner();
+          alertBox('Wallet connected.', 'success');
           refreshBasics();
-        } catch (e2) { alertBox('Switch/add failed: ' + e2.message, 'danger'); }
-      } else { alertBox('Switch failed: ' + e.message, 'danger'); }
-    }
-  };
-
-  // ---------- Test Tx ----------
-  $('btnSendTx').onclick = async () => {
-    try {
-      if (!signer) throw new Error('Connect wallet first.');
-      const amt = $('txAmount').value.trim().replace(',','.');
-      const maxFeeGwei = $('maxFee').value.trim().replace(',','.');
-      const to = await signer.getAddress();
-      $('txStatus').textContent = 'Sending…';
-      const tx = await signer.sendTransaction({
-        to,
-        value: ethers.parseEther(amt),
-        maxFeePerGas: ethers.parseUnits(maxFeeGwei, 'gwei'),
-        maxPriorityFeePerGas: ethers.parseUnits((Number(maxFeeGwei)/2).toString(), 'gwei')
+        } catch (e) { alertBox('Connect failed: ' + e.message, 'danger'); }
       });
-      $('txStatus').innerHTML = `Submitted: <a href="${explorerTx(tx.hash)}" target="_blank">${tx.hash}</a> — waiting…`;
-      const rcpt = await tx.wait();
-      $('txStatus').innerHTML = `Confirmed in block ${rcpt.blockNumber}. <a href="${explorerTx(tx.hash)}" target="_blank">View on explorer</a>`;
-      refreshBasics();
-    } catch (e) { $('txStatus').textContent = 'Error: ' + e.message; }
-  };
 
-  // ---------- Contract interaction ----------
-  const COUNTER_ABI = [
-    { "inputs": [], "name": "count", "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view","type":"function" },
-    { "inputs":[{"internalType":"string","name":"message","type":"string"}], "name":"increment", "outputs":[], "stateMutability":"nonpayable", "type":"function" },
-    { "anonymous":false,"inputs":[
-        {"indexed":true,"internalType":"address","name":"by","type":"address"},
-        {"indexed":false,"internalType":"uint256","name":"newCount","type":"uint256"},
-        {"indexed":false,"internalType":"string","name":"message","type":"string"}],
-      "name":"Increment","type":"event"}
-  ];
-  let counter;
-  $('btnLoadCtr').onclick = async () => {
-    try {
-      if (!signer) throw new Error('Connect wallet first.');
-      const addr = $('ctrAddr').value.trim();
-      if (!ethers.isAddress(addr)) throw new Error('Invalid contract address.');
-      counter = new ethers.Contract(addr, COUNTER_ABI, signer);
-      $('ctrStatus').textContent = 'Loaded. Try Read or Increment.';
-    } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
-  };
-  $('btnRead').onclick = async () => {
-    try {
-      if (!counter) throw new Error('Load a contract address first.');
-      $('ctrStatus').textContent = 'Reading…';
-      const c = await counter.count();
-      $('ctrStatus').textContent = `count() = ${c.toString()}`;
-    } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
-  };
-  $('btnInc').onclick = async () => {
-    try {
-      if (!counter) throw new Error('Load a contract address first.');
-      const message = $('msg').value || 'hello from MegaEngage';
-      $('ctrStatus').textContent = 'Sending increment()…';
-      const tx = await counter.increment(message);
-      $('ctrStatus').innerHTML = `Submitted: <a href="${explorerTx(tx.hash)}" target="_blank">${tx.hash}</a> — waiting…`;
-      const rcpt = await tx.wait();
-      $('ctrStatus').innerHTML = `Incremented in block ${rcpt.blockNumber}. <a href="${explorerTx(tx.hash)}" target="_blank">Explorer</a>`;
-    } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
-  };
+      const btnAddNet = $('btnAddNet');
+      if (btnAddNet) btnAddNet.addEventListener('click', async () => {
+        try {
+          requireMM();
+          await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
+          alertBox('MegaETH Testnet added to MetaMask.', 'success');
+          refreshBasics();
+        } catch (e) { alertBox('Add network failed: ' + e.message, 'danger'); }
+      });
 
-  // ---------- Calculator ----------
-  const inputs = ['bid','price','discount','bonus','supply','fdvPreset','fdvCustom','apy','compound'];
-  inputs.forEach(id => $(id)?.addEventListener('input', recalc));
-  $('toggleLock')?.addEventListener('click', () => {
-    const d = parseNum($('discount').value||0);
-    $('discount').value = (d>0?0:10).toString();
-    recalc();
-  });
-  $('fdvPreset')?.addEventListener('change', () => {
-    const v = $('fdvPreset').value;
-    if (v !== 'custom') $('fdvCustom').value = v;
-    recalc();
-  });
+      const btnSwitch = $('btnSwitch');
+      if (btnSwitch) btnSwitch.addEventListener('click', async () => {
+        try {
+          requireMM();
+          await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: chainParams.chainId }] });
+          alertBox('Switched to MegaETH Testnet.', 'success');
+          refreshBasics();
+        } catch (e) {
+          if (e.code === 4902) {
+            try {
+              await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [chainParams] });
+              alertBox('MegaETH Testnet added and switched.', 'success');
+              refreshBasics();
+            } catch (e2) { alertBox('Switch/add failed: ' + e2.message, 'danger'); }
+          } else { alertBox('Switch failed: ' + e.message, 'danger'); }
+        }
+      });
 
-  const COIN_APY_PRESET = {ATOM:20, XRP:5, ADA:12, DOT:12};
-  function setCoin(sym){
-    if (!$('coinSelect')) return;
-    $('coinSelect').value = sym;
-    ['coinLabel','coinLabel2','coinLabel3'].forEach(id=>$(id).textContent=sym);
-    if (COIN_APY_PRESET[sym] != null) { $('apy').value = COIN_APY_PRESET[sym]; }
-    recalc();
-  }
-  $('coinSelect')?.addEventListener('change', e=> setCoin(e.target.value));
-  document.querySelectorAll('#coinButtons [data-coin]')?.forEach(b=>b.addEventListener('click', ()=>setCoin(b.dataset.coin)));
+      // ---------- Test Tx ----------
+      const btnSendTx = $('btnSendTx');
+      if (btnSendTx) btnSendTx.addEventListener('click', async () => {
+        try {
+          if (!signer) throw new Error('Connect wallet first.');
+          const amt = $('txAmount').value.trim().replace(',','.');
+          const maxFeeGwei = $('maxFee').value.trim().replace(',','.');
+          const to = await signer.getAddress();
+          $('txStatus').textContent = 'Sending…';
+          const tx = await signer.sendTransaction({
+            to,
+            value: ethers.parseEther(amt),
+            maxFeePerGas: ethers.parseUnits(maxFeeGwei, 'gwei'),
+            maxPriorityFeePerGas: ethers.parseUnits((Number(maxFeeGwei)/2).toString(), 'gwei')
+          });
+          $('txStatus').innerHTML = `Submitted: <a href="${explorerTx(tx.hash)}" target="_blank">${tx.hash}</a> — waiting…`;
+          const rcpt = await tx.wait();
+          $('txStatus').innerHTML = `Confirmed in block ${rcpt.blockNumber}. <a href="${explorerTx(tx.hash)}" target="_blank">View on explorer</a>`;
+          refreshBasics();
+        } catch (e) { $('txStatus').textContent = 'Error: ' + e.message; }
+      });
 
-  document.querySelectorAll('[data-chg]')?.forEach(btn => btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-chg]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    recalc();
-  }));
-  $('useBonusForBreakeven')?.addEventListener('change', recalc);
+      // ---------- Contract interaction ----------
+      const COUNTER_ABI = [
+        { "inputs": [], "name": "count", "outputs":[{"internalType":"uint256","name":"","type":"uint256"}], "stateMutability":"view","type":"function" },
+        { "inputs":[{"internalType":"string","name":"message","type":"string"}], "name":"increment", "outputs":[], "stateMutability":"nonpayable", "type":"function" },
+        { "anonymous":false,"inputs":[
+            {"indexed":true,"internalType":"address","name":"by","type":"address"},
+            {"indexed":false,"internalType":"uint256","name":"newCount","type":"uint256"},
+            {"indexed":false,"internalType":"string","name":"message","type":"string"}],
+          "name":"Increment","type":"event"}
+      ];
+      let counter;
 
-  function vals(){
-    const bid = parseNum($('bid')?.value);
-    const price = parseNum($('price')?.value);
-    const discount = clamp(parseNum($('discount')?.value), 0, 50) / 100;
-    const bonus = clamp(parseNum($('bonus')?.value), 0, 100) / 100;
-    const supply = parseNum($('supply')?.value);
-    const fdv = parseNum($('fdvCustom')?.value);
-    const apy = parseNum($('apy')?.value)/100;
-    const compound = parseInt($('compound')?.value||12,10);
-    return {bid, price, discount, bonus, supply, fdv, apy, compound};
-  }
+      const btnLoadCtr = $('btnLoadCtr');
+      if (btnLoadCtr) btnLoadCtr.addEventListener('click', async () => {
+        try {
+          if (!signer) throw new Error('Connect wallet first.');
+          const addr = $('ctrAddr').value.trim();
+          if (!ethers.isAddress(addr)) throw new Error('Invalid contract address.');
+          counter = new ethers.Contract(addr, COUNTER_ABI, signer);
+          $('ctrStatus').textContent = 'Loaded. Try Read or Increment.';
+        } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
+      });
 
-  function recalc(){
-    const v = vals();
-    if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) {
-      ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>$(id)?.textContent='—');
-      $('breakevenRows') && ($('breakevenRows').innerHTML = '');
-      buildTweetPreview(); 
-      setTimeout(syncAllHeights, 50);
-      return;
+      const btnRead = $('btnRead');
+      if (btnRead) btnRead.addEventListener('click', async () => {
+        try {
+          if (!counter) throw new Error('Load a contract address first.');
+          $('ctrStatus').textContent = 'Reading…';
+          const c = await counter.count();
+          $('ctrStatus').textContent = `count() = ${c.toString()}`;
+        } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
+      });
+
+      const btnInc = $('btnInc');
+      if (btnInc) btnInc.addEventListener('click', async () => {
+        try {
+          if (!counter) throw new Error('Load a contract address first.');
+          const message = $('msg').value || 'hello from MegaEngage';
+          $('ctrStatus').textContent = 'Sending increment()…';
+          const tx = await counter.increment(message);
+          $('ctrStatus').innerHTML = `Submitted: <a href="${explorerTx(tx.hash)}" target="_blank">${tx.hash}</a> — waiting…`;
+          const rcpt = await tx.wait();
+          $('ctrStatus').innerHTML = `Incremented in block ${rcpt.blockNumber}. <a href="${explorerTx(tx.hash)}" target="_blank">Explorer</a>`;
+        } catch (e) { $('ctrStatus').textContent = 'Error: ' + e.message; }
+      });
+
+      // ---------- Calculator / Compare ----------
+      const inputs = ['bid','price','discount','bonus','supply','fdvPreset','fdvCustom','apy','compound'];
+      inputs.forEach(id => {
+        const el = $(id);
+        if (el) el.addEventListener('input', recalc);
+      });
+
+      const toggleLock = $('toggleLock');
+      if (toggleLock) toggleLock.addEventListener('click', () => {
+        const d = parseNum($('discount').value||0);
+        $('discount').value = (d>0?0:10).toString();
+        recalc();
+      });
+
+      const fdvPreset = $('fdvPreset');
+      if (fdvPreset) fdvPreset.addEventListener('change', () => {
+        const v = fdvPreset.value;
+        const fdvCustom = $('fdvCustom');
+        if (v !== 'custom' && fdvCustom) fdvCustom.value = v;
+        recalc();
+      });
+
+      const COIN_APY_PRESET = {ATOM:20, XRP:5, ADA:12, DOT:12};
+      function setCoin(sym){
+        const sel = $('coinSelect'); if (sel) sel.value = sym;
+        ['coinLabel','coinLabel2','coinLabel3'].forEach(id=>{ const n=$(id); if(n) n.textContent=sym; });
+        if (COIN_APY_PRESET[sym] != null && $('apy')) { $('apy').value = COIN_APY_PRESET[sym]; }
+        recalc();
+      }
+      const coinSelect = $('coinSelect');
+      if (coinSelect) coinSelect.addEventListener('change', e=> setCoin(e.target.value));
+
+      document.querySelectorAll('#coinButtons [data-coin]').forEach(b=>{
+        b.addEventListener('click', ()=>setCoin(b.getAttribute('data-coin')));
+      });
+
+      document.querySelectorAll('[data-chg]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-chg]').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          recalc();
+        });
+      });
+
+      const useBonusCk = $('useBonusForBreakeven');
+      if (useBonusCk) useBonusCk.addEventListener('change', recalc);
+
+      function vals(){
+        const bid = parseNum($('bid')?.value);
+        const price = parseNum($('price')?.value);
+        const discount = clamp(parseNum($('discount')?.value), 0, 50) / 100;
+        const bonus = clamp(parseNum($('bonus')?.value), 0, 100) / 100;
+        const supply = parseNum($('supply')?.value);
+        const fdv = parseNum($('fdvCustom')?.value);
+        const apy = parseNum($('apy')?.value)/100;
+        const compound = parseInt(($('compound')?.value||12),10);
+        return {bid, price, discount, bonus, supply, fdv, apy, compound};
+      }
+
+      function recalc(){
+        const v = vals();
+        if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) {
+          ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>{ const n=$(id); if(n) n.textContent='—'; });
+          const br = $('breakevenRows'); if (br) br.innerHTML = '';
+          buildTweetPreview();
+          setTimeout(syncAllHeights, 50);
+          return;
+        }
+        const effPrice = v.price * (1 - v.discount);
+        const tokensBase = v.bid / effPrice;
+        const tokensBonus = tokensBase * (1 + v.bonus);
+        const tgePrice = v.fdv / v.supply;
+        const valBase = tokensBase * tgePrice;
+        const valBonus = tokensBonus * tgePrice;
+        const roiBase = (valBase - v.bid) / v.bid * 100;
+        const roiBonus = (valBonus - v.bid) / v.bid * 100;
+
+        const s = (id, text) => { const n=$(id); if(n) n.textContent=text; };
+        s('effPrice', '$'+fmtPrice(effPrice));
+        s('tokensBase', fmtNum(tokensBase));
+        s('tokensBonus', fmtNum(tokensBonus));
+        s('tgePrice', '$'+fmtPrice(tgePrice));
+        s('valBase', fmtUSD(valBase));
+        s('valBonus', fmtUSD(valBonus));
+        s('roiBase', (roiBase>=0?'+':'') + fmtNum(roiBase) + '%');
+        s('roiBonus', (roiBonus>=0?'+':'') + fmtNum(roiBonus) + '%');
+
+        // Breakeven table
+        const scenarios = [-0.30, 0, 0.50];
+        const compound = parseInt(($('compound')?.value||12),10);
+        const factor = Math.pow(1 + (v.apy/compound), compound);
+        const useBonus = !!(useBonusCk && useBonusCk.checked);
+        const tokensForBreakeven = useBonus ? tokensBonus : tokensBase;
+        const br = $('breakevenRows');
+        if (br){
+          br.innerHTML = scenarios.map(chg => {
+            const endValue = v.bid * factor * (1 + chg);
+            const neededPrice = tokensForBreakeven>0 ? endValue / tokensForBreakeven : NaN;
+            const neededFDV = neededPrice * v.supply;
+            return `<tr>
+              <td>${(chg*100>0?'+':'')}${(chg*100).toFixed(0)}%</td>
+              <td class="mono">${fmtUSD(endValue)}</td>
+              <td class="mono">$${fmtPrice(neededPrice)}</td>
+              <td class="mono">${neededFDV>0?('$'+neededFDV.toLocaleString()):'—'}</td>
+            </tr>`;
+          }).join('');
+        }
+
+        buildTweetPreview();
+        setTimeout(syncAllHeights, 50);
+      }
+
+      // ---------- CSV Export ----------
+      const btnCSV = $('btnCSV');
+      if (btnCSV) btnCSV.addEventListener('click', () => {
+        const v = vals();
+        if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) { alertBox('Fill bid, price, supply, FDV first.', 'warning'); return; }
+        const effPrice = v.price*(1-v.discount);
+        const tokensBase = v.bid/effPrice;
+        const tokensBonus = tokensBase*(1+v.bonus);
+        const tgePrice = v.fdv/v.supply;
+        const valBase = tokensBase*tgePrice, valBonus = tokensBonus*tgePrice;
+        const roiBase = (valBase-v.bid)/v.bid*100, roiBonus=(valBonus-v.bid)/v.bid*100;
+        const factorMonthly = Math.pow(1+(parseNum($('apy')?.value)/100/12),12);
+        const endFlat = v.bid * factorMonthly;
+
+        const rows = [
+          ['Parameter','Value'],
+          ['Bid (USDT)', v.bid],
+          ['Clearing price P', v.price],
+          ['Lock discount %', ((v.discount*100)||0).toFixed(2)],
+          ['Bonus %', ((v.bonus*100)||0).toFixed(2)],
+          ['Supply', v.supply],
+          ['TGE FDV', v.fdv],
+          ['TGE price', tgePrice],
+          [],
+          ['Metric','No bonus','With bonus'],
+          ['Effective paid price', effPrice, effPrice],
+          ['Tokens', tokensBase, tokensBonus],
+          ['Value @ TGE', valBase, valBonus],
+          ['ROI %', roiBase, roiBonus],
+          [],
+          ['Holding APY % (12m, monthly comp.)', (parseNum($('apy')?.value)||0).toFixed(2)],
+          ['End value if holding flat', endFlat],
+          [],
+          ['Δ','End value (holding)','Breakeven TGE px','Breakeven FDV']
+        ];
+
+        [-0.30,0,0.50].forEach(chg=>{
+          const endValue = v.bid * Math.pow(1+(parseNum($('apy')?.value)/100/12),12) * (1+chg);
+          const priceReq = endValue / (tokensBonus>0 ? tokensBonus : tokensBase);
+          rows.push([(chg*100)+'%', endValue, priceReq, priceReq*v.supply]);
+        });
+
+        const csv = rows.map(r => (r||[]).map(c => {
+          const s = (c===undefined||c===null) ? '' : String(c);
+          return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+        }).join(',')).join('\n');
+
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'}); const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url;
+        const ts = new Date().toISOString().replace(/[:.]/g,'-');
+        a.download = `mega_calculator_${ts}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      });
+
+      // ---------- Tweets ----------
+      function buildTweetPreview(){
+        const v = vals();
+        const eff = (v.price>0) ? v.price*(1-v.discount) : NaN;
+        const tokens = (v.bid>0 && eff>0) ? v.bid/eff : 0;
+        const tgePx = (v.fdv>0 && v.supply>0) ? v.fdv/v.supply : 0;
+        const roi = (tokens*tgePx>0 && v.bid>0) ? ((tokens*tgePx - v.bid)/v.bid*100) : 0;
+
+        const bidLine = `Bid: $${(v.bid||0).toLocaleString()} • Lock: ${((v.discount||0)*100).toFixed(0)}% • Eff: $${isFinite(eff)?eff.toFixed(5):'—'}`;
+        const tokLine = `Tokens≈ ${isFinite(tokens)?Math.round(tokens).toLocaleString():'—'} • TGE FDV $${(v.fdv||0).toLocaleString()} • TGE px≈ $${isFinite(tgePx)?tgePx.toFixed(3):'—'}`;
+        const roiLine = `Est. TGE ROI≈ ${isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(1)+'%':'—'}`;
+
+        const intros = [
+          "🤖 Mega Engage!\nI have farmed @megaeth_labs testnet, calculated my dream allocation and even convinced myself to dump my dead bags to buy some $MEGA!",
+          "🤖 Mega Engage!\nGrinding @megaeth_labs testnet, ran the calculator, and rotating out of the fossils into $MEGA.",
+          "🤖 Mega Engage!\nFarming @megaeth_labs testnet + the airdrop tool — I’m ditching the dead weight for $MEGA.",
+          "🤖 Mega Engage!\nAuction math + testnet receipts say it’s time: reallocating into $MEGA.",
+          "🤖 Mega Engage!\nCalculator done. Testnet done. I just moved the dusty bags toward $MEGA."
+        ];
+
+        const repo = $('repoUrl')?.value?.trim(); 
+        const site = $('siteUrl')?.value?.trim(); 
+        const handle = $('xHandle')?.value?.trim();
+        const txs = $('txHashes')?.value?.trim().split('\n').filter(Boolean) || [];
+        const tail = [
+          repo ? `Repo: ${repo}` : null,
+          site ? `Live: ${site}` : null,
+          txs.length ? `Tx: ${txs.slice(0,5).join(' ')}` : null,
+          handle ? `cc ${handle}` : null,
+          "#MegaETH #L2 #web3 #MegaEngage"
+        ].filter(Boolean).join('\n');
+
+        const posts = intros.map(intro => [intro, bidLine, tokLine, roiLine, tail].filter(Boolean).join('\n'));
+
+        for(let i=1;i<=5;i++){
+          const out = $('tweetOut'+i); const link = $('tweetLink'+i);
+          if (!out || !link) continue;
+          out.value = posts[i-1] || posts[0];
+          link.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(out.value);
+        }
+      }
+
+      const btnBuildTweet = $('btnBuildTweet');
+      if (btnBuildTweet) btnBuildTweet.addEventListener('click', buildTweetPreview);
+      document.querySelectorAll('[data-copy]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const sel = btn.getAttribute('data-copy');
+          const txt = document.querySelector(sel)?.value || '';
+          try{ await navigator.clipboard.writeText(txt); alertBox('Tweet copied to clipboard!', 'success'); }
+          catch(e){ alertBox('Copy failed: '+e.message, 'danger'); }
+        });
+      });
+
+      if (window.ethereum) {
+        window.ethereum.on('accountsChanged', () => location.reload());
+        window.ethereum.on('chainChanged', () => location.reload());
+      }
+
+      // init
+      setCoin('ATOM');
+      recalc();
+      setTimeout(syncAllHeights, 200);
+    } catch (e) {
+      const el = document.getElementById('alerts');
+      if (el) el.innerHTML = `<div class="alert alert-danger">Init error: ${e.message}</div>`;
+      console.error(e);
     }
-    const effPrice = v.price * (1 - v.discount);
-    const tokensBase = v.bid / effPrice;
-    const tokensBonus = tokensBase * (1 + v.bonus);
-    const tgePrice = v.fdv / v.supply;
-    const valBase = tokensBase * tgePrice;
-    const valBonus = tokensBonus * tgePrice;
-    const roiBase = (valBase - v.bid) / v.bid * 100;
-    const roiBonus = (valBonus - v.bid) / v.bid * 100;
-
-    $('effPrice').textContent = '$' + fmtPrice(effPrice);
-    $('tokensBase').textContent = fmtNum(tokensBase);
-    $('tokensBonus').textContent = fmtNum(tokensBonus);
-    $('tgePrice').textContent = '$' + fmtPrice(tgePrice);
-    $('valBase').textContent = fmtUSD(valBase);
-    $('valBonus').textContent = fmtUSD(valBonus);
-    $('roiBase').textContent = (roiBase>=0?'+':'') + fmtNum(roiBase) + '%';
-    $('roiBonus').textContent = (roiBonus>=0?'+':'') + fmtNum(roiBonus) + '%';
-
-    // Breakeven table
-    const scenarios = [-0.30, 0, 0.50];
-    const factor = Math.pow(1 + (v.apy/ (parseInt($('compound')?.value||12,10))), parseInt($('compound')?.value||12,10));
-    const useBonus = $('useBonusForBreakeven')?.checked;
-    const tokensForBreakeven = useBonus ? tokensBonus : tokensBase;
-    if ($('breakevenRows')){
-      $('breakevenRows').innerHTML = scenarios.map(chg => {
-        const endValue = v.bid * factor * (1 + chg);
-        const neededPrice = tokensForBreakeven>0 ? endValue / tokensForBreakeven : NaN;
-        const neededFDV = neededPrice * v.supply;
-        return `<tr>
-          <td>${(chg*100>0?'+':'')}${(chg*100).toFixed(0)}%</td>
-          <td class="mono">${fmtUSD(endValue)}</td>
-          <td class="mono">$${fmtPrice(neededPrice)}</td>
-          <td class="mono">${neededFDV>0?('$'+neededFDV.toLocaleString()):'—'}</td>
-        </tr>`;
-      }).join('');
-    }
-
-    buildTweetPreview();
-    setTimeout(syncAllHeights, 50);
-  }
-
-  // ---------- CSV Export ----------
-  $('btnCSV')?.addEventListener('click', () => {
-    const v = vals();
-    if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) { alertBox('Fill bid, price, supply, FDV first.', 'warning'); return; }
-    const effPrice = v.price*(1-v.discount);
-    const tokensBase = v.bid/effPrice;
-    const tokensBonus = tokensBase*(1+v.bonus);
-    const tgePrice = v.fdv/v.supply;
-    const valBase = tokensBase*tgePrice, valBonus = tokensBonus*tgePrice;
-    const roiBase = (valBase-v.bid)/v.bid*100, roiBonus=(valBonus-v.bid)/v.bid*100;
-    const factorMonthly = Math.pow(1+(parseNum($('apy')?.value)/100/12),12);
-    const endFlat = v.bid * factorMonthly;
-
-    const rows = [
-      ['Parameter','Value'],
-      ['Bid (USDT)', v.bid],
-      ['Clearing price P', v.price],
-      ['Lock discount %', (v.discount*100).toFixed(2)],
-      ['Bonus %', (v.bonus*100).toFixed(2)],
-      ['Supply', v.supply],
-      ['TGE FDV', v.fdv],
-      ['TGE price', tgePrice],
-      [],
-      ['Metric','No bonus','With bonus'],
-      ['Effective paid price', effPrice, effPrice],
-      ['Tokens', tokensBase, tokensBonus],
-      ['Value @ TGE', valBase, valBonus],
-      ['ROI %', roiBase, roiBonus],
-      [],
-      ['Holding APY % (12m, monthly comp.)', (parseNum($('apy')?.value)).toFixed(2)],
-      ['End value if holding flat', endFlat],
-      [],
-      ['Δ','End value (holding)','Breakeven TGE px','Breakeven FDV']
-    ];
-
-    [-0.30,0,0.50].forEach(chg=>{
-      const endValue = v.bid * Math.pow(1+(parseNum($('apy')?.value)/100/12),12) * (1+chg);
-      const priceReq = endValue / (tokensBonus>0 ? tokensBonus : tokensBase);
-      rows.push([(chg*100)+'%', endValue, priceReq, priceReq*v.supply]);
-    });
-
-    const csv = rows.map(r => (r||[]).map(c => {
-      const s = (c===undefined||c===null) ? '' : String(c);
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
-    }).join(',')).join('\n');
-
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'}); const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url;
-    const ts = new Date().toISOString().replace(/[:.]/g,'-');
-    a.download = `mega_calculator_${ts}.csv`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   });
-
-  // ---------- Tweets ----------
-  function buildTweetPreview(){
-    const v = vals();
-    const eff = (v.price>0) ? v.price*(1-v.discount) : NaN;
-    const tokens = (v.bid>0 && eff>0) ? v.bid/eff : 0;
-    const tgePx = (v.fdv>0 && v.supply>0) ? v.fdv/v.supply : 0;
-    const roi = (tokens*tgePx>0 && v.bid>0) ? ((tokens*tgePx - v.bid)/v.bid*100) : 0;
-
-    const bidLine = `Bid: $${(v.bid||0).toLocaleString()} • Lock: ${(v.discount*100||0).toFixed(0)}% • Eff: $${isFinite(eff)?eff.toFixed(5):'—'}`;
-    const tokLine = `Tokens≈ ${isFinite(tokens)?Math.round(tokens).toLocaleString():'—'} • TGE FDV $${(v.fdv||0).toLocaleString()} • TGE px≈ $${isFinite(tgePx)?tgePx.toFixed(3):'—'}`;
-    const roiLine = `Est. TGE ROI≈ ${isFinite(roi)?(roi>=0?'+':'')+roi.toFixed(1)+'%':'—'}`;
-
-    const intros = [
-      "🤖 Mega Engage!\nI have farmed @megaeth_labs testnet, calculated my dream allocation and even convinced myself to dump my dead bags to buy some $MEGA!",
-      "🤖 Mega Engage!\nGrinding @megaeth_labs testnet, ran the calculator, and rotating out of the fossils into $MEGA.",
-      "🤖 Mega Engage!\nFarming @megaeth_labs testnet + the airdrop tool — I’m ditching the dead weight for $MEGA.",
-      "🤖 Mega Engage!\nAuction math + testnet receipts say it’s time: reallocating into $MEGA.",
-      "🤖 Mega Engage!\nCalculator done. Testnet done. I just moved the dusty bags toward $MEGA."
-    ];
-
-    const repo = $('repoUrl')?.value?.trim(); 
-    const site = $('siteUrl')?.value?.trim(); 
-    const handle = $('xHandle')?.value?.trim();
-    const txs = $('txHashes')?.value?.trim().split('\n').filter(Boolean) || [];
-    const tail = [
-      repo ? `Repo: ${repo}` : null,
-      site ? `Live: ${site}` : null,
-      txs.length ? `Tx: ${txs.slice(0,5).join(' ')}` : null,
-      handle ? `cc ${handle}` : null,
-      "#MegaETH #L2 #web3 #MegaEngage"
-    ].filter(Boolean).join('\n');
-
-    const posts = intros.map(intro => [intro, bidLine, tokLine, roiLine, tail].filter(Boolean).join('\n'));
-
-    for(let i=1;i<=5;i++){
-      const out = $('tweetOut'+i); const link = $('tweetLink'+i);
-      if (!out || !link) continue;
-      out.value = posts[i-1] || posts[0];
-      link.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(out.value);
-    }
-  }
-  $('btnBuildTweet')?.addEventListener('click', buildTweetPreview);
-  document.querySelectorAll('[data-copy]')?.forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      const sel = btn.getAttribute('data-copy');
-      const txt = document.querySelector(sel)?.value || '';
-      try{ await navigator.clipboard.writeText(txt); alertBox('Tweet copied to clipboard!', 'success'); }
-      catch(e){ alertBox('Copy failed: '+e.message, 'danger'); }
-    });
-  });
-
-  // ---------- React to account/network changes ----------
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', () => location.reload());
-    window.ethereum.on('chainChanged', () => location.reload());
-  }
-
-  // init
-  setCoin('ATOM'); 
-  recalc();
-  window.addEventListener('load', syncAllHeights);
-})();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
