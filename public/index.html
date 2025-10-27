@@ -15,11 +15,11 @@
   <style>
     /* ---------- Theme ---------- */
     :root{
-      --page-top:#d2d2d2;     /* banner section (very light) */
-      --page-bottom:#606060;  /* main background under tabs */
+      --page-top:#d2d2d2;     /* banner section */
+      --page-bottom:#606060;  /* main background */
       --card:#222831;         /* dark grey card */
       --border:#3a414b;
-      --fg:#f7f9fc;           /* main text inside cards */
+      --fg:#f7f9fc;           /* text inside cards */
       --fg-strong:#ffffff;    /* headings/KPIs */
       --fg-muted:#d7dee7;     /* labels inside cards */
       --accent:#0d6efd;
@@ -100,9 +100,9 @@
     .table-responsive{ -webkit-overflow-scrolling:touch; background:transparent!important; }
 
     /* Layout helpers */
-    .stack > .card + .card{margin-top:1rem;} /* vertical stacking spacing */
+    .stack > .card + .card{margin-top:1rem;} /* vertical spacing */
 
-    /* --- Mobile tap/overlay fixes for Broken Coins --- */
+    /* --- Mobile tap/overlay fixes for coin selector --- */
     #coinSelect{ position:relative; z-index:5; pointer-events:auto; }
     #pane-calc .card{ overflow:visible; }
     .table-responsive{ position:relative; z-index:1; }
@@ -114,7 +114,7 @@
 <div class="top-shell">
   <div class="banner-wrap text-center py-3">
     <picture>
-      <source srcset="assets/megaengage-banner.webp" type="image/webp">
+      <source src="assets/megaengage-banner.webp" type="image/webp">
       <img src="assets/megaengage-banner.webp"
            onerror="this.onerror=null;this.src='assets/megaengage-banner.png';"
            alt="MegaEngage" class="img-fluid banner-logo">
@@ -155,7 +155,6 @@
       <!-- ===================== ENGAGE ===================== -->
       <div class="tab-pane fade show active" id="pane-engage" role="tabpanel" aria-labelledby="tab-engage">
 
-        <!-- Two-column layout: left = 1,2,3 stacked; right = 4 -->
         <div class="row g-3">
           <!-- LEFT column: stack 1), 2), 3) -->
           <div class="col-12 col-lg-7 stack">
@@ -249,9 +248,10 @@ contract MegaCounter {
             </div>
           </div>
 
-          <!-- RIGHT column: 4) Bad Bunnz -->
+          <!-- RIGHT column -->
           <div class="col-12 col-lg-5">
-            <div class="card p-3 h-100">
+            <!-- 4) Bad Bunnz -->
+            <div class="card p-3 mb-3">
               <h2 class="h5 mb-2">4) Bad Bunnz NFT (MegaETH)</h2>
               <p class="muted mb-3">
                 Bad Bunnz is <em>probably</em> the leading web3 project on MegaETH right now.
@@ -265,7 +265,7 @@ contract MegaCounter {
 
       <!-- ===================== CALCULATOR ===================== -->
       <div class="tab-pane fade" id="pane-calc" role="tabpanel" aria-labelledby="tab-calc">
-        <!-- Inputs -->
+        <!-- Inputs (no coin/APY now) -->
         <div class="card p-3 mb-3">
           <h2 class="h5 mb-3">MEGA Airdrop / Allocation Calculator</h2>
           <div class="row g-3">
@@ -310,35 +310,6 @@ contract MegaCounter {
             <div class="col-md-3">
               <label class="form-label">TGE FDV (custom, $)</label>
               <input id="fdvCustom" type="number" class="form-control" value="2000000000" step="50000000">
-            </div>
-
-            <div class="col-md-3">
-              <label class="form-label">Holding APY (%)</label>
-              <input id="apy" type="number" class="form-control" value="20" min="0" max="100" step="0.1">
-              <div class="form-text muted">Compounded for 12m breakeven</div>
-            </div>
-
-            <!-- Broken Coins selector (desktop = select; mobile = pill buttons) -->
-            <div class="col-md-6 col-lg-3">
-              <!-- Desktop -->
-              <label class="form-label d-none d-lg-block">Compare holding (“Broken Coins”)</label>
-              <select id="coinSelect" class="form-select d-none d-lg-block">
-                <option value="ATOM" selected>ATOM</option>
-                <option value="XRP">XRP</option>
-                <option value="ADA">ADA</option>
-                <option value="DOT">DOT</option>
-              </select>
-              <div class="form-text muted d-none d-lg-block">Prefills APY; you can still edit it.</div>
-
-              <!-- Mobile -->
-              <label class="form-label d-lg-none">Compare holding (“Broken Coins”)</label>
-              <div id="coinButtons" class="d-flex gap-2 flex-wrap d-lg-none">
-                <button type="button" class="btn btn-outline-light btn-sm" data-coin="ATOM">ATOM</button>
-                <button type="button" class="btn btn-outline-light btn-sm" data-coin="XRP">XRP</button>
-                <button type="button" class="btn btn-outline-light btn-sm" data-coin="ADA">ADA</button>
-                <button type="button" class="btn btn-outline-light btn-sm" data-coin="DOT">DOT</button>
-              </div>
-              <div class="form-text muted d-lg-none">Tap a coin; APY prefills.</div>
             </div>
           </div>
         </div>
@@ -389,7 +360,37 @@ contract MegaCounter {
 
           <div class="col-lg-6">
             <div class="card p-3 h-100">
-              <h3 class="h6 mb-3">Breakeven vs Holding <span id="coinLabel">ATOM</span> (12 months)</h3>
+              <!-- New main title -->
+              <h3 class="h6 mb-3">Compare MegaEngage with holding your 'broken' coins!</h3>
+
+              <!-- Coin selection -->
+              <div class="mb-3">
+                <label class="form-label d-none d-lg-block">Coin selection</label>
+                <select id="coinSelect" class="form-select d-none d-lg-block" style="max-width:260px">
+                  <option value="ATOM" selected>ATOM</option>
+                  <option value="XRP">XRP</option>
+                  <option value="ADA">ADA</option>
+                  <option value="DOT">DOT</option>
+                </select>
+                <!-- Mobile pills -->
+                <div id="coinButtons" class="d-flex gap-2 flex-wrap d-lg-none mt-1">
+                  <button type="button" class="btn btn-outline-light btn-sm" data-coin="ATOM">ATOM</button>
+                  <button type="button" class="btn btn-outline-light btn-sm" data-coin="XRP">XRP</button>
+                  <button type="button" class="btn btn-outline-light btn-sm" data-coin="ADA">ADA</button>
+                  <button type="button" class="btn btn-outline-light btn-sm" data-coin="DOT">DOT</button>
+                </div>
+              </div>
+
+              <!-- Holding APY moved here -->
+              <div class="mb-3" style="max-width:260px">
+                <label class="form-label">Holding APY (%)</label>
+                <input id="apy" type="number" class="form-control" value="20" min="0" max="100" step="0.1">
+                <div class="form-text muted">Compounded for 12m breakeven</div>
+              </div>
+
+              <!-- Sub-title -->
+              <h4 class="h6 mb-2">Breakeven vs Holding <span id="coinLabel">ATOM</span> (12 months)</h4>
+
               <div class="row g-2">
                 <div class="col-md-5">
                   <div class="muted">Compounding</div>
@@ -408,6 +409,7 @@ contract MegaCounter {
                   </div>
                 </div>
               </div>
+
               <div class="table-responsive mt-3">
                 <table class="table table-sm table-bordered align-middle text-nowrap">
                   <thead>
@@ -421,6 +423,7 @@ contract MegaCounter {
                   <tbody id="breakevenRows"></tbody>
                 </table>
               </div>
+
               <div class="form-check mt-2">
                 <input class="form-check-input" type="checkbox" id="useBonusForBreakeven">
                 <label class="form-check-label" for="useBonusForBreakeven">Use <span class="mono">tokens (with bonus)</span> for breakeven</label>
@@ -436,7 +439,6 @@ contract MegaCounter {
           <h2 class="h5 mb-2">Tweet Badge Generator</h2>
           <p class="muted mb-3">Creates 5 variations with the required intro + your live calculator numbers.</p>
 
-          <!-- Optional metadata (kept for future use) -->
           <div class="row g-3">
             <div class="col-md-4">
               <label class="form-label">Your repo URL (optional)</label>
@@ -460,7 +462,6 @@ contract MegaCounter {
             <button id="btnBuildTweet" class="btn btn-primary">Build 5 posts</button>
           </div>
 
-          <!-- Five outputs -->
           <div id="tweetSet">
             <!-- Post #1 -->
             <div class="border rounded p-2 mb-3">
@@ -517,7 +518,6 @@ contract MegaCounter {
 </div>
 
 <script>
-/* Wait until the ethers UMD has really loaded before initializing UI */
 function waitForEthers(){
   return new Promise((resolve, reject) => {
     let tries = 0;
@@ -701,27 +701,27 @@ waitForEthers().then(() => {
 
   // ---------- Calculator ----------
   const inputs = ['bid','price','discount','bonus','supply','fdvPreset','fdvCustom','apy','compound'];
-  inputs.forEach(id => document.getElementById(id).addEventListener('input', recalc));
-  document.getElementById('toggleLock').addEventListener('click', () => {
+  inputs.forEach(id => document.getElementById(id)?.addEventListener('input', recalc));
+  document.getElementById('toggleLock')?.addEventListener('click', () => {
     const d = parseFloat(document.getElementById('discount').value||0);
     document.getElementById('discount').value = (d>0?0:10).toString(); recalc();
   });
-  document.getElementById('fdvPreset').addEventListener('change', () => {
+  document.getElementById('fdvPreset')?.addEventListener('change', () => {
     const v = document.getElementById('fdvPreset').value;
     if (v !== 'custom') document.getElementById('fdvCustom').value = v; recalc();
   });
   document.querySelectorAll('[data-chg]').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('[data-chg]').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
   }));
-  document.getElementById('useBonusForBreakeven').addEventListener('change', recalc);
+  document.getElementById('useBonusForBreakeven')?.addEventListener('change', recalc);
 
   function vals(){
     const $=id=>document.getElementById(id);
-    const bid=+($('bid').value||0), price=+($('price').value||0);
-    const discount=Math.min(Math.max(+($('discount').value||0),0),50)/100;
-    const bonus=Math.min(Math.max(+($('bonus').value||0),0),100)/100;
-    const supply=+($('supply').value||0), fdv=+($('fdvCustom').value||0);
-    const apy=+($('apy').value||0)/100, compound=parseInt($('compound').value||12,10);
+    const bid=+($('bid')?.value||0), price=+($('price')?.value||0);
+    const discount=Math.min(Math.max(+($('discount')?.value||0),0),50)/100;
+    const bonus=Math.min(Math.max(+($('bonus')?.value||0),0),100)/100;
+    const supply=+($('supply')?.value||0), fdv=+($('fdvCustom')?.value||0);
+    const apy=+($('apy')?.value||0)/100, compound=parseInt($('compound')?.value||12,10);
     return {bid,price,discount,bonus,supply,fdv,apy,compound};
   }
 
@@ -729,7 +729,7 @@ waitForEthers().then(() => {
     const v = vals();
     if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) {
       ['effPrice','tokensBase','tokensBonus','tgePrice','valBase','valBonus','roiBase','roiBonus'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
-      document.getElementById('breakevenRows').innerHTML = '';
+      const br=document.getElementById('breakevenRows'); if(br) br.innerHTML='';
       if (window.buildTweetSet) window.buildTweetSet();
       return;
     }
@@ -747,9 +747,9 @@ waitForEthers().then(() => {
     document.getElementById('roiBonus').textContent = (roiBonus>=0?'+':'') + roiBonus.toLocaleString(undefined,{maximumFractionDigits:2}) + '%';
 
     // Breakeven table
-    const comp = parseInt(document.getElementById('compound').value,10)||12;
+    const comp = parseInt(document.getElementById('compound')?.value||'12',10);
     const factor = Math.pow(1 + (v.apy/comp), comp);
-    const useBonus = document.getElementById('useBonusForBreakeven').checked;
+    const useBonus = document.getElementById('useBonusForBreakeven')?.checked;
     const tokensForBreakeven = useBonus ? tokensBonus : tokensBase;
     const scenarios = [-0.30, 0, 0.50];
     document.getElementById('breakevenRows').innerHTML = scenarios.map(chg=>{
@@ -768,7 +768,7 @@ waitForEthers().then(() => {
   }
 
   // CSV
-  document.getElementById('btnCSV').addEventListener('click', () => {
+  document.getElementById('btnCSV')?.addEventListener('click', () => {
     const v = vals();
     if (!(v.bid>0 && v.price>0 && v.supply>0 && v.fdv>0)) { alertBox('Fill bid, price, supply, FDV first.', 'warning'); return; }
     const effPrice=v.price*(1-v.discount);
@@ -824,7 +824,6 @@ waitForEthers().then(() => {
 
 <!-- ===== Tweet builder (5 variations, exact format) ===== -->
 <script>
-  // Format helpers: thin-space (U+202F) thousands, fixed decimals where needed
   const thinSpace = '\u202F';
   const withThinSpaces = (s) => s.replace(/,/g, thinSpace);
   const fmtThin = (n, opts) => withThinSpaces(Number(n).toLocaleString('en-US', opts));
@@ -845,7 +844,6 @@ waitForEthers().then(() => {
     return { bid, discountPct: discount*100, eff, tokens, fdv, tgePx, roiPct };
   }
 
-  // Five intro lines — include @megaeth_labs and $MEGA
   const INTRO_BODIES = [
     "I have farmed @megaeth_labs testnet, calculated my dream allocation and even convinced myself to dump my dead bags to buy some $MEGA!",
     "Grinding @megaeth_labs testnet, ran the calculator, and rotating out of the fossils into $MEGA.",
@@ -861,9 +859,8 @@ waitForEthers().then(() => {
   }
 
   function buildPost(bodyLine2, vals){
-    // Exact structure requested
     const L1 = "🤖 Mega Engage!";
-    const L2 = bodyLine2; // includes @megaeth_labs and $MEGA
+    const L2 = bodyLine2;
     const L3 = `Bid: ${fmtMoneyNoCentsThin(vals.bid)} • Lock: ${fmtNumThin(vals.discountPct,0,0)}% • Eff: ${fmtMoneyThin(vals.eff,5,5)}`;
     const L4 = `Tokens≈ ${fmtNumThin(Math.round(vals.tokens))} • TGE FDV ${fmtMoneyNoCentsThin(vals.fdv)} • TGE px≈ ${fmtMoneyThin(vals.tgePx,3,3)}`;
     const sign = vals.roiPct>=0?'+':'';
@@ -886,10 +883,7 @@ waitForEthers().then(() => {
     });
   }
 
-  // Expose for recalc() to refresh tweets after inputs change:
   window.buildTweetSet = buildTweetSet;
-
-  // Button + automatic initial build
   document.getElementById('btnBuildTweet')?.addEventListener('click', buildTweetSet);
   buildTweetSet();
 </script>
