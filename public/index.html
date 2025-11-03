@@ -18,6 +18,9 @@
     }
   </script>
 
+  <!-- ADD: external CSS for the widget (kept everything else identical) -->
+  <link rel="stylesheet" href="./mega-widget.css">
+
   <style>
     :root{
       --page-top:#d2d2d2;
@@ -236,6 +239,35 @@ contract MegaCounter {
 
       <!-- ============ CALCULATOR ============ -->
       <div class="tab-pane fade" id="pane-calc">
+
+        <!-- ADD: Presale participants + Wallet score widget (purely additive) -->
+        <div class="row g-3 mb-1" id="mega-widget">
+          <div class="col-12 col-lg-4">
+            <div class="card p-3 h-100">
+              <h2 class="h6 mb-1">Presale participants</h2>
+              <p class="muted mb-2">Unique USDT depositors into the MegaETH public sale.</p>
+              <div class="d-flex align-items-baseline gap-3">
+                <div id="mega-participants" class="display-6 mono">—</div>
+                <button class="btn btn-outline-light btn-sm" onclick="window.__megaWidget && __megaWidget.loadParticipants()">Refresh</button>
+              </div>
+              <div class="small muted mt-2" id="mega-updated"></div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-8">
+            <div class="card p-3 h-100">
+              <h2 class="h6 mb-2">Wallet score</h2>
+              <p class="muted mb-2">Testnet activity + Fluffle / Bad Bunnz / Megalio + presale.</p>
+              <div class="input-group mb-2" style="max-width:680px;">
+                <span class="input-group-text">0x</span>
+                <input id="mega-addr" type="text" class="form-control" placeholder="address (with or without 0x)">
+                <button class="btn btn-primary" onclick="window.__megaWidget && __megaWidget.score()">Check</button>
+              </div>
+              <pre id="mega-result" class="mono" style="min-height:140px;white-space:pre-wrap;background:#0f141a;border:1px solid var(--border);border-radius:12px;padding:12px;">Enter a wallet and click Check.</pre>
+            </div>
+          </div>
+        </div>
+        <!-- END ADD -->
+
         <div class="row g-3 align-items-stretch">
           <div class="col-12 col-lg-6">
             <div class="meme meme-4x3">
@@ -852,7 +884,7 @@ contract MegaCounter {
       // init
       setCoin('ATOM');
       recalc();
-      setTimeout(syncAllHeights, 200);
+      setTimeout(()=>{ const ev=new Event('resize'); window.dispatchEvent(ev); },200);
     } catch (e) {
       const el = document.getElementById('alerts');
       if (el) el.innerHTML = `<div class="alert alert-danger">Init error: ${e.message}</div>`;
@@ -860,6 +892,10 @@ contract MegaCounter {
     }
   });
 </script>
+
+<!-- ADD: external JS for the widget, then auto-load presale number -->
+<script src="./mega-widget.js"></script>
+<script> if (window.__megaWidget && __megaWidget.loadParticipants) { window.__megaWidget.loadParticipants(); } </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
