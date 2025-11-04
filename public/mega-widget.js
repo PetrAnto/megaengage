@@ -1,110 +1,82 @@
-// public/mega-widget.js
+/* public/mega-widget.js
+   Robust client for presale + wallet score with safe fallback to workers.dev
+*/
 (function () {
-  const $ = (id) => document.getElementById(id);
+  const SAME_ORIGIN = `${location.origin}/api`;
+  const WORKER_ORIGIN = `https://megaeth-score.petrantonft.workers.dev/api`;
 
-  // --- alert helper (uses your existing #alerts area) ---
-  function alertBox(msg, type = "warning") {
-    const el = $("alerts");
-    if (!el) return;
-    el.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-      ${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>`;
-  }
-
-  // --- smart BASE: same-origin first, workers.dev fallback ---
-  const FALLBACK_ORIGIN = "https://megaeth-score.petrantonft.workers.dev";
-  let BASE = `${location.origin}/api`;
-  let switchedToFallback = false;
-
-  async function fetchApi(path, opts = {}) {
-    const tryFetch = async (origin) => {
-      const res = await fetch(`${origin}${path}`, {
-        method: "GET",
-        mode: "cors",
-        credentials: "omit",
-        cache: "no-store",
-        ...opts,
-        headers: {
-          "Accept": "application/json",
-          ...(opts.headers || {}),
-        },
-      });
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(`HTTP ${res.status} ${res.statusText} — ${text.slice(0, 120)}`);
-      }
+  // Try same-origin first, then worker; only consider true JSON as success.
+  async function fetchJSON(path, init) {
+    // helper: fetch + validate JSON
+    const tryFetch = async (base) => {
+      const url = `${base}${path}`;
+      const res = await fetch(url, { ...init, cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`);
+      const ct = (res.headers.get("content-type") || "").toLowerCase();
+      // must look like JSON
+      if (!ct.includes("application/json")) throw new Error(`Non-JSON @ ${url}`);
       return res.json();
     };
 
     try {
-      return await tryFetch(BASE);
-    } catch (e) {
-      if (!switchedToFallback) {
-        console.warn("API failed on same-origin, switching to workers.dev:", e.message);
-        switchedToFallback = true;
-        BASE = `${FALLBACK_ORIGIN}/api`;
-        try {
-          return await tryFetch(BASE);
-        } catch (e2) {
-          throw new Error(`API failed on both origins. Last error: ${e2.message}`);
-        }
+      return await tryFetch(SAME_ORIGIN);
+    } catch (_) {
+      // fall back to workers.dev
+      try {
+        return await tryFetch(WORKER_ORIGIN.replace(/\/api$/, "")); // ensure single /api
+      } catch (e2) {
+        throw e2;
       }
-      throw e;
     }
   }
 
-  // --- participants widget ---
+  // --------- DOM helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const setText = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  const setPre = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+
+  // --------- Public API ----------
   async function loadParticipants() {
-    const nEl = $("mega-participants");
-    const tEl = $("mega-updated");
-    if (nEl) nEl.textContent = "—";
-    if (tEl) tEl.textContent = "";
-
     try {
-      const data = await fetchApi("/presale/participants/count");
-      if (nEl) nEl.textContent = (data.uniqueDepositors ?? 0).toLocaleString();
-      if (tEl) tEl.textContent = data.lastUpdated
-        ? `Updated ${new Date(data.lastUpdated).toLocaleString()}`
-        : "";
-    } catch (err) {
-      alertBox(`Participants fetch error: ${err.message}`, "danger");
+      setText("mega-participants", "—");
+      setText("mega-updated", "");
+      const data = await fetchJSON(`/presale/participants/count`);
+      setText("mega-participants", (data.uniqueDepositors ?? 0).toLocaleString());
+      const ts = data.lastUpdated ? new Date(data.lastUpdated) : new Date();
+      setText(
+        "mega-updated",
+        `Updated ${ts.toLocaleDateString()} ${ts.toLocaleTimeString()}`
+      );
+    } catch (e) {
+      // don’t bubble to window.onerror; show a small hint in the card only
+      setText("mega-participants", "—");
+      setText("mega-updated", "Unavailable (routing/CORS).");
+      console.debug("[mega-widget] participants error:", e.message);
     }
-  }
-
-  // --- score widget ---
-  function normalizeAddr(v) {
-    let s = String(v || "").trim();
-    if (!s) return null;
-    s = s.startsWith("0x") ? s : `0x${s}`;
-    if (!/^0x[0-9a-fA-F]{40}$/.test(s)) return null;
-    return s;
   }
 
   async function score() {
     const input = $("mega-addr");
     const out = $("mega-result");
-    if (out) out.textContent = "Checking…";
-
-    const addr = normalizeAddr(input && input.value);
-    if (!addr) {
-      if (out) out.textContent = "Enter a valid wallet (0x + 40 hex).";
+    if (!input || !out) return;
+    const raw = (input.value || "").trim();
+    // accept with or without 0x; normalize
+    const addr = raw.startsWith("0x") ? raw : (raw ? "0x" + raw : "");
+    if (!/^0x[0-9a-fA-F]{40}$/.test(addr)) {
+      setPre("mega-result", "Enter a valid EVM address (40 hex chars).");
       return;
     }
 
+    setPre("mega-result", "Checking…");
     try {
-      const data = await fetchApi(`/score?address=${encodeURIComponent(addr)}`);
-      if (out) {
-        out.textContent = JSON.stringify(data, null, 2);
-      }
-    } catch (err) {
-      if (out) out.textContent = `Error: ${err.message}`;
-      alertBox(`Score fetch error: ${err.message}`, "danger");
+      const data = await fetchJSON(`/score?address=${addr}`);
+      setPre("mega-result", JSON.stringify(data, null, 2));
+    } catch (e) {
+      setPre("mega-result", `Error fetching score (routing/CORS). Try again.\n\n${e.message}`);
+      console.debug("[mega-widget] score error:", e.message);
     }
   }
 
-  // expose to inline onclick handlers
+  // expose
   window.__megaWidget = { loadParticipants, score };
-
-  // auto-load participants on first paint (safe if called again)
-  try { loadParticipants(); } catch {}
 })();
