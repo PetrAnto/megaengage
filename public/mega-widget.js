@@ -1,33 +1,48 @@
 /* public/mega-widget.js
-   Robust client for presale + wallet score with safe fallback to workers.dev
+   Robust client for presale + wallet score with safe multi-origin fallback.
 */
 (function () {
+  // --- API bases (avec /api à la fin)
   const SAME_ORIGIN = `${location.origin}/api`;
-  const WORKER_ORIGIN = `https://megaeth-score.petrantonft.workers.dev/api`;
+  const CUSTOM_ORIGIN = `https://megascore.petranto.com/api`;
+  const WORKERS_FALLBACK = `https://megaeth-score.petrantonft.workers.dev/api`;
 
-  // Try same-origin first, then worker; only consider true JSON as success.
-  async function fetchJSON(path, init) {
-    // helper: fetch + validate JSON
-    const tryFetch = async (base) => {
-      const url = `${base}${path}`;
-      const res = await fetch(url, { ...init, cache: "no-store" });
+  // --- util: fetch JSON avec timeout + vérif content-type
+  async function fetchJsonWithTimeout(url, init = {}, ms = 12000) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), ms);
+    try {
+      const res = await fetch(url, {
+        ...init,
+        cache: "no-store",
+        credentials: "omit",
+        signal: ctl.signal,
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`);
       const ct = (res.headers.get("content-type") || "").toLowerCase();
-      // must look like JSON
       if (!ct.includes("application/json")) throw new Error(`Non-JSON @ ${url}`);
-      return res.json();
-    };
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 
-    try {
-      return await tryFetch(SAME_ORIGIN);
-    } catch (_) {
-      // fall back to workers.dev
+  // Essaye chaque base jusqu'à succès
+  async function fetchJSON(path, init) {
+    const bases = [SAME_ORIGIN, CUSTOM_ORIGIN, WORKERS_FALLBACK];
+    let lastErr;
+    for (const base of bases) {
+      const baseClean = base.replace(/\/+$/, ""); // trim trailing /
+      const pathClean = "/" + String(path || "").replace(/^\/+/, ""); // ensure single leading /
+      const url = `${baseClean}${pathClean}`;
       try {
-        return await tryFetch(WORKER_ORIGIN.replace(/\/api$/, "")); // ensure single /api
-      } catch (e2) {
-        throw e2;
+        return await fetchJsonWithTimeout(url, init);
+      } catch (e) {
+        lastErr = e;
+        // essaie suivant
       }
     }
+    throw lastErr || new Error("All endpoints failed");
   }
 
   // --------- DOM helpers ----------
@@ -40,18 +55,15 @@
     try {
       setText("mega-participants", "—");
       setText("mega-updated", "");
+      // Routes supportées par le Worker: /api/presale/participants/count (et /participants en compat)
       const data = await fetchJSON(`/presale/participants/count`);
       setText("mega-participants", (data.uniqueDepositors ?? 0).toLocaleString());
       const ts = data.lastUpdated ? new Date(data.lastUpdated) : new Date();
-      setText(
-        "mega-updated",
-        `Updated ${ts.toLocaleDateString()} ${ts.toLocaleTimeString()}`
-      );
+      setText("mega-updated", `Updated ${ts.toLocaleDateString()} ${ts.toLocaleTimeString()}`);
     } catch (e) {
-      // don’t bubble to window.onerror; show a small hint in the card only
       setText("mega-participants", "—");
       setText("mega-updated", "Unavailable (routing/CORS).");
-      console.debug("[mega-widget] participants error:", e.message);
+      console.debug("[mega-widget] participants error:", e.message || e);
     }
   }
 
@@ -59,9 +71,13 @@
     const input = $("mega-addr");
     const out = $("mega-result");
     if (!input || !out) return;
+
     const raw = (input.value || "").trim();
-    // accept with or without 0x; normalize
-    const addr = raw.startsWith("0x") ? raw : (raw ? "0x" + raw : "");
+    // accepte avec ou sans 0x ; normalise
+    const addr = raw
+      ? (raw.startsWith("0x") ? raw : "0x" + raw)
+      : "";
+
     if (!/^0x[0-9a-fA-F]{40}$/.test(addr)) {
       setPre("mega-result", "Enter a valid EVM address (40 hex chars).");
       return;
@@ -69,11 +85,15 @@
 
     setPre("mega-result", "Checking…");
     try {
-      const data = await fetchJSON(`/score?address=${addr}`);
+      // Routes supportées: /api/score?address=0x... (et /score en compat)
+      const data = await fetchJSON(`/score?address=${encodeURIComponent(addr)}`);
       setPre("mega-result", JSON.stringify(data, null, 2));
     } catch (e) {
-      setPre("mega-result", `Error fetching score (routing/CORS). Try again.\n\n${e.message}`);
-      console.debug("[mega-widget] score error:", e.message);
+      setPre(
+        "mega-result",
+        `Error fetching score (routing/CORS). Try again.\n\n${(e && e.message) || e}`
+      );
+      console.debug("[mega-widget] score error:", e.message || e);
     }
   }
 
